@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -69,17 +69,19 @@ namespace MyLinks
 
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            using (OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "图片文件|*.jpg;*.jpeg;*.png;*.bmp;*.gif;*.wmf|所有文件|*",
                 Multiselect = false
-            };
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            })
             {
-                f1.backimage[i] = openFileDialog.FileName;
-                textBoxImg.Text = f1.backimage[i];
-                Image image = Image.FromFile(f1.backimage[i]);
-                f1.listViews[i].BackgroundImage = image;
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    f1.backimage[i] = openFileDialog.FileName;
+                    textBoxImg.Text = f1.backimage[i];
+                    Image image = Image.FromFile(f1.backimage[i]);
+                    f1.listViews[i].BackgroundImage = image;
+                }
             }
         }
 
@@ -89,21 +91,23 @@ namespace MyLinks
 
         private void ButtonAdd_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                foreach (string file1 in openFileDialog.FileNames)
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    ListViewItem item = new ListViewItem
+                    foreach (string file1 in openFileDialog.FileNames)
                     {
-                        Text = System.IO.Path.GetFileName(file1)
-                    };
-                    item.SubItems.Add(file1);
-                    item.SubItems.Add("");
-                    item.SubItems.Add("False");
-                    listView.Items.Add(item);
+                        ListViewItem item = new ListViewItem
+                        {
+                            Text = System.IO.Path.GetFileName(file1)
+                        };
+                        item.SubItems.Add(file1);
+                        item.SubItems.Add("");
+                        item.SubItems.Add("False");
+                        listView.Items.Add(item);
+                    }
+                    listView.Items[listView.Items.Count - 1].Selected = true;
                 }
-                listView.Items[listView.Items.Count - 1].Selected = true;
             }
         }
 
@@ -130,19 +134,21 @@ namespace MyLinks
 
         private void ButtonInsert_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == DialogResult.OK && listView.SelectedItems.Count > 0)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                foreach (string file1 in openFileDialog.FileNames)
+                if (openFileDialog.ShowDialog() == DialogResult.OK && listView.SelectedItems.Count > 0)
                 {
-                    ListViewItem item = new ListViewItem
+                    foreach (string file1 in openFileDialog.FileNames)
                     {
-                        Text = System.IO.Path.GetFileName(file1)
-                    };
-                    item.SubItems.Add(file1);
-                    item.SubItems.Add("");
-                    item.SubItems.Add("False");
-                    listView.Items.Insert(listView.SelectedItems[0].Index, item);
+                        ListViewItem item = new ListViewItem
+                        {
+                            Text = System.IO.Path.GetFileName(file1)
+                        };
+                        item.SubItems.Add(file1);
+                        item.SubItems.Add("");
+                        item.SubItems.Add("False");
+                        listView.Items.Insert(listView.SelectedItems[0].Index, item);
+                    }
                 }
             }
         }
