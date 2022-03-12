@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -56,10 +56,8 @@ namespace MyLinks
 
         private void FormMain_MouseDown(object sender, MouseEventArgs e)
         {
-
-                ReleaseCapture();
-                SendMessage(Handle, 0x0112, 0xF010 + 0x0002, 0);
-            
+            ReleaseCapture();
+            SendMessage(Handle, 0x0112, 0xF010 + 0x0002, 0);
         }
 
         private void FormMain_Load(object sender, EventArgs e)
@@ -252,7 +250,6 @@ namespace MyLinks
                         fileLists[i].list[fileLists[i].list.Count - 1].RunAsA = runas;
                     }
                     InitListView(i);
-
                 }
             }
             catch (Exception)
@@ -350,10 +347,13 @@ namespace MyLinks
         private void 平铺ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.Tile;
         private void 添加ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                AddFiles(openFileDialog.FileNames, tabControl.SelectedIndex);
+                openFileDialog.Multiselect = true;
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    AddFiles(openFileDialog.FileNames, tabControl.SelectedIndex);
+                }
             }
         }
 
@@ -384,7 +384,6 @@ namespace MyLinks
 
         private void 查看文件ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             if (listViews[tabControl.SelectedIndex].SelectedItems.Count > 0)
             {
                 int i = listViews[tabControl.SelectedIndex].SelectedItems[0].Index;
@@ -447,35 +446,41 @@ namespace MyLinks
                     Args = fileLists[i1].list[i].Arg,
                     RunAsA = fileLists[i1].list[i].RunAsA
                 };
-                EditIco editIco = new EditIco(f1, TopMost);
-                if (editIco.ShowDialog() == DialogResult.OK)
+                using (EditIco editIco = new EditIco(f1, TopMost))
                 {
-                    if (fileLists[i1].list[i].fileInfo.FullName != editIco.f.Path)
+                    if (editIco.ShowDialog() == DialogResult.OK)
                     {
-                        fileLists[i1].list[i] = new FileInfoWithIcon(editIco.f.Path);
-                        fileLists[i1].imageListLargeIcon.Images[i] = fileLists[i1].list[i].largeIcon.ToBitmap();
-                        fileLists[i1].imageListSmallIcon.Images[i] = fileLists[i1].list[i].smallIcon.ToBitmap();
+                        if (fileLists[i1].list[i].fileInfo.FullName != editIco.f.Path)
+                        {
+                            fileLists[i1].list[i] = new FileInfoWithIcon(editIco.f.Path);
+                            fileLists[i1].imageListLargeIcon.Images[i] = fileLists[i1].list[i].largeIcon.ToBitmap();
+                            fileLists[i1].imageListSmallIcon.Images[i] = fileLists[i1].list[i].smallIcon.ToBitmap();
+                        }
+                        fileLists[i1].list[i].Arg = editIco.f.Args;
+                        fileLists[i1].list[i].Name = editIco.f.Name;
+                        fileLists[i1].list[i].RunAsA = editIco.f.RunAsA;
+                        InitListView(i1);
+                        WriteCfg();
                     }
-                    fileLists[i1].list[i].Arg = editIco.f.Args;
-                    fileLists[i1].list[i].Name = editIco.f.Name;
-                    fileLists[i1].list[i].RunAsA = editIco.f.RunAsA;
-                    InitListView(i1);
-                    WriteCfg();
                 }
             }
         }
 
         private void 修改本栏ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            EditTab editTab = new EditTab(this, tabControl.SelectedIndex);
-            editTab.ShowDialog();
+            using (EditTab editTab = new EditTab(this, tabControl.SelectedIndex))
+            {
+                editTab.ShowDialog();
+            }
             InitListView(tabControl.SelectedIndex);
         }
 
         private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Setting setting = new Setting(this, tabControl.SelectedIndex);
-            setting.ShowDialog();
+            using (Setting setting = new Setting(this, tabControl.SelectedIndex))
+            {
+                setting.ShowDialog();
+            }
             WriteCfg();
             notifyIcon.Text = Text;
         }
