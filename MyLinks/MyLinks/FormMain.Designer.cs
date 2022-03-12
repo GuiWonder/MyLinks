@@ -1,4 +1,4 @@
-﻿namespace MyLinks
+namespace MyLinks
 {
     partial class FormMain
     {
@@ -347,6 +347,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(660, 427);
+            this.ContextMenuStrip = this.contextMenuStripMain;
             this.Controls.Add(this.tabControl);
             this.Name = "FormMain";
             this.ShowIcon = false;
