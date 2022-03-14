@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -37,6 +37,12 @@ namespace MyLinks
             }
             link = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\" + lnkname;
             checkBoxAutoStart.Checked = System.IO.File.Exists(link);
+            checkBoxAutoStart.Click += CheckBoxAutoStart_Click;
+        }
+
+        private void CheckBoxAutoStart_Click(object sender, EventArgs e)
+        {
+            AutoStart(checkBoxAutoStart.Checked);
         }
 
         private void CheckBoxHideStart_CheckedChanged(object sender, EventArgs e) => f1.hideStart = checkBoxHideStart.Checked;
@@ -44,11 +50,12 @@ namespace MyLinks
         private void CheckBoxTopmost_CheckedChanged(object sender, EventArgs e) => f1.TopMost = checkBoxTopmost.Checked;
         private void CheckBoxNotExit_CheckedChanged(object sender, EventArgs e) => f1.notexit = checkBoxNotExit.Checked;
         private void TextBoxTitle_TextChanged(object sender, EventArgs e) => f1.Text = textBoxTitle.Text;
-        private void CheckBoxAutoStart_CheckedChanged(object sender, EventArgs e)
+
+        private void AutoStart(bool isAuto)
         {
             try
             {
-                if (checkBoxAutoStart.Checked)
+                if (isAuto)
                 {
                     var shellType = Type.GetTypeFromProgID("WScript.Shell");
                     dynamic shell = Activator.CreateInstance(shellType);
