@@ -13,42 +13,73 @@ namespace MyLinks
 {
     public partial class FormMain : Form
     {
-        public FileInfoList[] fileLists;
+        public List<FileInfoList> fileLists = new List<FileInfoList>();
         readonly string cfgFile = "MyLinks.xml";
-        public string[] backimage = new string[] { "", "", "", "" };
-        public bool notexit = true;
+        public List<string> backimage = new List<string>();
+        public bool notexit;
         private bool goexit = false;
         public bool hideStart;
         public bool hideRun;
-        public ListView[] listViews;
-
+        public List<ListView> listViews = new List<ListView>();
+        public TabControl tabControl;
         public FormMain()
         {
             InitializeComponent();
-            listViews = new ListView[] { listView1, listView2, listView3, listView4 };
-            foreach (ListView item in listViews)
-            {
-                item.DragEnter += ListViews_DragEnter;
-                item.DragDrop += ListViews_DragDrop;
-                item.MouseClick += ListViews_MouseClick;
-                FormClosing += FormMain_FormClosing;
-                Load += FormMain_Load;
-                MouseDown += FormMain_MouseDown;
-                item.Columns.Add("名称", 100, HorizontalAlignment.Left);
-                item.Columns.Add("时间", 100, HorizontalAlignment.Left);
-                item.Columns.Add("类型", 60, HorizontalAlignment.Left);
-                item.Columns.Add("大小", 80, HorizontalAlignment.Left);
-                item.Columns.Add("参数", 100, HorizontalAlignment.Left);
-                item.Columns.Add("路径", 210, HorizontalAlignment.Left);
-            }
-            fileLists = new FileInfoList[4];
-            for (int i = 0; i < fileLists.Length; i++)
-            {
-                fileLists[i] = new FileInfoList(new string[] { });
-            }
+            FormClosing += FormMain_FormClosing;
+            Load += FormMain_Load;
+            MouseDown += FormMain_MouseDown;
+            tabControl = new TabControl();
+            tabControl.Alignment = TabAlignment.Bottom;
+            tabControl.ContextMenuStrip = contextMenuStripMain;
+            tabControl.Dock = DockStyle.Fill;
+            tabControl.ItemSize = new Size(48, 16);
+            tabControl.Location = new Point(0, 0);
+            tabControl.Margin = new Padding(0);
+            tabControl.Padding = new Point(0, 0);
+            tabControl.SelectedIndex = 0;
+            tabControl.Size = new Size(660, 427);
+            Controls.Add(tabControl);
             ReadCfg();
             notifyIcon.Text = Text;
         }
+
+        private void AddTab(string tabname)
+        {
+            backimage.Add("");
+            FileInfoList fileInfoList = new FileInfoList(new string[] { });
+            fileLists.Add(fileInfoList);
+            ListView listView = new ListView();
+            listView.AllowDrop = true;
+            listView.BorderStyle = BorderStyle.None;
+            listView.ContextMenuStrip = contextMenuStripMain;
+            listView.Dock = DockStyle.Fill;
+            listView.HideSelection = false;
+            listView.Location = new Point(0, 0);
+            listView.Margin = new Padding(0);
+            listView.Size = new Size(652, 403);
+            listView.TabIndex = 0;
+            listView.UseCompatibleStateImageBehavior = false;
+            listView.DragDrop += ListViews_DragDrop;
+            listView.DragEnter += ListViews_DragEnter;
+            listView.MouseClick += ListViews_MouseClick;
+            listView.Columns.Add("名称", 100, HorizontalAlignment.Left);
+            listView.Columns.Add("时间", 100, HorizontalAlignment.Left);
+            listView.Columns.Add("类型", 60, HorizontalAlignment.Left);
+            listView.Columns.Add("大小", 80, HorizontalAlignment.Left);
+            listView.Columns.Add("参数", 100, HorizontalAlignment.Left);
+            listView.Columns.Add("路径", 210, HorizontalAlignment.Left);
+            listViews.Add(listView);
+            TabPage tabPage = new TabPage();
+            tabPage.Controls.Add(listView);
+            tabPage.Location = new Point(4, 4);
+            tabPage.Margin = new Padding(0);
+            tabPage.Size = new Size(652, 403);
+            tabPage.TabIndex = 0;
+            tabPage.Text = tabname;
+            tabPage.UseVisualStyleBackColor = true;
+            tabControl.TabPages.Add(tabPage);
+        }
+
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern bool ReleaseCapture();
         [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -94,27 +125,23 @@ namespace MyLinks
 
         private void RunIcon(string path, string arg, bool runas)
         {
-            if (path.Trim('\"').EndsWith(".exe"))
+            string dir = System.IO.Path.GetDirectoryName(path);
+            if (path.Contains(" "))
             {
-                string dir = System.IO.Path.GetDirectoryName(path);
-                using (System.Diagnostics.Process p = new System.Diagnostics.Process())
-                {
-                    if (runas)
-                    {
-                        p.StartInfo.Verb = "runas";
-                        p.StartInfo.UseShellExecute = true;
-                    }
-                    p.StartInfo.FileName = "\"" + path + "\"";
-                    p.StartInfo.Arguments = arg;
-                    //p.StartInfo.UseShellExecute = false;
-                    p.StartInfo.WorkingDirectory = dir;
-                    p.Start();
-                    p.Close();
-                }
+                path = "\"" + path + "\"";
             }
-            else
+            using (System.Diagnostics.Process p = new System.Diagnostics.Process())
             {
-                System.Diagnostics.Process.Start("\"" + path + "\"");
+                if (runas)
+                {
+                    p.StartInfo.Verb = "runas";
+                }
+                p.StartInfo.UseShellExecute = true;
+                p.StartInfo.FileName = path;
+                p.StartInfo.Arguments = arg;
+                p.StartInfo.WorkingDirectory = dir;
+                p.Start();
+                p.Close();
             }
         }
 
@@ -128,16 +155,6 @@ namespace MyLinks
             doc.AppendChild(cfg);
             XmlElement set = doc.CreateElement("Setting");
             cfg.AppendChild(set);
-            for (int i = 0; i < 4; i++)
-            {
-                XmlElement bk = doc.CreateElement($"BackImage{i}");
-                bk.SetAttribute("On", (listViews[i].BackgroundImage != null).ToString());
-                bk.InnerText = backimage[i];
-                set.AppendChild(bk);
-                XmlElement bkt = doc.CreateElement($"BackImageTiled{i}");
-                bkt.InnerText = listViews[i].BackgroundImageTiled.ToString();
-                set.AppendChild(bkt);
-            }
             XmlElement h = doc.CreateElement("Height");
             h.InnerText = Height.ToString();
             set.AppendChild(h);
@@ -168,30 +185,40 @@ namespace MyLinks
             XmlElement tbindex = doc.CreateElement("TableIndex");
             tbindex.InnerText = tabControl.SelectedIndex.ToString();
             set.AppendChild(tbindex);
-            for (int i = 0; i < 4; i++)
+            XmlElement datas = doc.CreateElement("Datas");
+            cfg.AppendChild(datas);
+            for (int i = 0; i < tabControl.TabPages.Count; i++)
             {
-                XmlElement datas = doc.CreateElement($"Data{i}");
-                XmlElement tbtext = doc.CreateElement("TableText");
-                tbtext.InnerText = tabControl.TabPages[i].Text;
-                datas.AppendChild(tbtext);
+                XmlElement tbnane = doc.CreateElement($"Name");
+                tbnane.InnerText = tabControl.TabPages[i].Text;
+                XmlElement bk = doc.CreateElement($"BackImage");
+                bk.SetAttribute("On", (listViews[i].BackgroundImage != null).ToString());
+                bk.SetAttribute("Tiled", listViews[i].BackgroundImageTiled.ToString());
+                bk.InnerText = backimage[i];
+                XmlElement fcolor = doc.CreateElement($"ListForeColor");
+                fcolor.InnerText = listViews[i].ForeColor.ToArgb().ToString();
+                XmlElement tab = doc.CreateElement($"Table");
+                tab.AppendChild(tbnane);
+                tab.AppendChild(bk);
+                tab.AppendChild(fcolor);
                 foreach (FileInfoWithIcon item in fileLists[i].list)
                 {
-                    XmlElement data = doc.CreateElement($"Data");
+                    XmlElement data = doc.CreateElement("Data");
                     XmlElement name = doc.CreateElement("Name");
                     name.InnerText = item.Name;
                     XmlElement fullpath = doc.CreateElement("FullPath");
                     fullpath.InnerText = item.fileInfo.FullName;
-                    XmlElement aig = doc.CreateElement("Args");
-                    aig.InnerText = item.Arg;
+                    XmlElement arg = doc.CreateElement("Args");
+                    arg.InnerText = item.Arg;
                     XmlElement runas = doc.CreateElement("RunAs");
                     runas.InnerText = item.RunAsA.ToString();
                     data.AppendChild(name);
                     data.AppendChild(fullpath);
-                    data.AppendChild(aig);
+                    data.AppendChild(arg);
                     data.AppendChild(runas);
-                    datas.AppendChild(data);
+                    tab.AppendChild(data);
                 }
-                cfg.AppendChild(datas);
+                datas.AppendChild(tab);
             }
             doc.Save(cfgFile);
         }
@@ -225,20 +252,22 @@ namespace MyLinks
                     ly = 0;
                 }
                 Location = new Point(lx, ly);
-                for (int i = 0; i < 4; i++)
+                XmlNodeList tabs = doc.SelectNodes($"Config/Datas/Table");
+                for (int i = 0; i < tabs.Count; i++)
                 {
-                    backimage[i] = doc.SelectSingleNode($"Config/Setting/BackImage{i}").InnerText;
-                    if (bool.Parse(doc.SelectSingleNode($"Config/Setting/BackImage{i}").Attributes["On"].Value))
+                    AddTab(tabs[i].SelectSingleNode("Name").InnerText);
+                    backimage[i] = tabs[i].SelectSingleNode("BackImage").InnerText;
+                    if (bool.Parse(tabs[i].SelectSingleNode($"BackImage").Attributes["On"].Value))
                     {
                         if (System.IO.File.Exists(backimage[i]))
                         {
                             listViews[i].BackgroundImage = Image.FromFile(backimage[i]);
                         }
                     }
-                    listViews[i].BackgroundImageTiled = bool.Parse(doc.SelectSingleNode($"Config/Setting/BackImageTiled{i}").InnerText);
-                    tabControl.TabPages[i].Text = doc.SelectSingleNode($"Config/Data{i}/TableText").InnerText;
-                    XmlNodeList datasi = doc.SelectNodes($"Config/Data{i}/Data");
-                    foreach (XmlNode item in datasi)
+                    listViews[i].BackgroundImageTiled = bool.Parse(tabs[i].SelectSingleNode("BackImage").Attributes["Tiled"].Value);
+                    listViews[i].ForeColor = Color.FromArgb(int.Parse(tabs[i].SelectSingleNode("ListForeColor").InnerText));
+                    XmlNodeList items = tabs[i].SelectNodes("Data");
+                    foreach (XmlNode item in items)
                     {
                         string name = item.SelectSingleNode("Name").InnerText;
                         string fullpath = item.SelectSingleNode("FullPath").InnerText;
@@ -251,6 +280,7 @@ namespace MyLinks
                     }
                     InitListView(i);
                 }
+                tabControl.SelectedIndex = int.Parse(doc.SelectSingleNode("Config/Setting/TableIndex").InnerText);
             }
             catch (Exception)
             { }
@@ -260,19 +290,19 @@ namespace MyLinks
         private void ListViews_DragDrop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            int i = int.Parse(((ListView)sender).Name.Substring(8)) - 1;
-            AddFiles(files, i);
+            AddFiles(files);
         }
 
         private void ListViews_DragEnter(object sender, DragEventArgs e) => e.Effect = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.All : DragDropEffects.None;
 
-        private void AddFiles(string[] files, int i)
+        private void AddFiles(string[] files)
         {
+            int i = tabControl.SelectedIndex;
             foreach (string item in files)
             {
                 if (item.ToLower().EndsWith(".lnk"))
                 {
-                    AddLink(item, i);
+                    AddLink(item);
                 }
                 else
                 {
@@ -314,8 +344,9 @@ namespace MyLinks
             listViews[i].EndUpdate();
         }
 
-        private void AddLink(string item, int i)
+        private void AddLink(string item)
         {
+            int i = tabControl.SelectedIndex;
             var shellType = Type.GetTypeFromProgID("WScript.Shell");
             dynamic shell = Activator.CreateInstance(shellType);
             var shortcut = shell.CreateShortcut(item);
@@ -352,7 +383,7 @@ namespace MyLinks
                 openFileDialog.Multiselect = true;
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    AddFiles(openFileDialog.FileNames, tabControl.SelectedIndex);
+                    AddFiles(openFileDialog.FileNames);
                 }
             }
         }
@@ -362,13 +393,15 @@ namespace MyLinks
             int i = tabControl.SelectedIndex;
             if (listViews[i].SelectedItems.Count > 0)
             {
-                if (MessageBox.Show(this, "确定？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                if (MessageBox.Show(this, "确定要删除选择的项目吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
                 {
                     return;
                 }
                 int j = listViews[i].SelectedItems[0].Index;
-                listViews[i].SelectedItems[0].Remove();
-                fileLists[i].RemoveFileAt(j);
+                for (int i1 = 0; i1 < ((System.Collections.IList)listViews[i].SelectedItems).Count; i1++)
+                {
+                    fileLists[i].RemoveFileAt(j);
+                }
                 InitListView(i);
                 if (j < listViews[i].Items.Count)
                 {
@@ -387,13 +420,11 @@ namespace MyLinks
             if (listViews[tabControl.SelectedIndex].SelectedItems.Count > 0)
             {
                 int i = listViews[tabControl.SelectedIndex].SelectedItems[0].Index;
-
                 string ffull = "\"" + fileLists[tabControl.SelectedIndex].list[i].fileInfo.FullName + "\"";
                 using (System.Diagnostics.Process p = new System.Diagnostics.Process())
                 {
                     p.StartInfo.FileName = "Explorer.exe";
                     p.StartInfo.Arguments = "/e,/select," + ffull;
-                    //p.StartInfo.UseShellExecute = false;
                     p.Start();
                     p.Close();
                 }
@@ -402,7 +433,7 @@ namespace MyLinks
 
         private void 清空ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (fileLists[tabControl.SelectedIndex].list.Count >= 1 && MessageBox.Show(this, "确定？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            if (fileLists[tabControl.SelectedIndex].list.Count >= 1 && MessageBox.Show(this, "确定要删除所有项目？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 fileLists[tabControl.SelectedIndex].RemoveAll();
                 InitListView(tabControl.SelectedIndex);
@@ -500,6 +531,49 @@ namespace MyLinks
                 e.Cancel = true;
                 Hide();
             }
+        }
+
+        private void ContextMenuStripMain_Opening(object sender, CancelEventArgs e)
+        {
+            bool b = listViews.Count > 0 && listViews[tabControl.SelectedIndex].SelectedItems.Count > 0;
+            管理员方式运行ToolStripMenuItem.Visible = b;
+            删除ToolStripMenuItem.Visible = b;
+            查看文件ToolStripMenuItem.Visible = b;
+            编辑ToolStripMenuItem.Visible = b;
+            刪除栏ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            查看ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            添加ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            清空ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0 && listViews[tabControl.SelectedIndex].Items.Count > 0; ;
+            修改本栏ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+        }
+
+        private void 添加栏ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (NameTab nameTab = new NameTab(null))
+            {
+                nameTab.TopMost = TopMost;
+                if (nameTab.ShowDialog() == DialogResult.OK)
+                {
+                    AddTab(nameTab.name);
+                    tabControl.SelectedIndex = tabControl.TabPages.Count - 1;
+                }
+            }
+        }
+
+        private void 刪除栏ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabControl.SelectedIndex > -1 && MessageBox.Show(this, "确定要删除选择的项目吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            {
+                RemoveTab(tabControl.SelectedIndex);
+            }
+        }
+
+        private void RemoveTab(int i)
+        {
+            backimage.RemoveAt(i);
+            fileLists.RemoveAt(i);
+            listViews.RemoveAt(i);
+            tabControl.TabPages.RemoveAt(i);
         }
     }
 
