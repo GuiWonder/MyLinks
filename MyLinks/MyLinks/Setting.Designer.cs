@@ -1,4 +1,4 @@
-﻿namespace MyLinks
+namespace MyLinks
 {
     partial class Setting
     {
@@ -44,7 +44,7 @@
             this.checkBoxHideStart.Name = "checkBoxHideStart";
             this.checkBoxHideStart.Size = new System.Drawing.Size(108, 16);
             this.checkBoxHideStart.TabIndex = 4;
-            this.checkBoxHideStart.Text = "启动后进入后台";
+            this.checkBoxHideStart.Text = "启动后隐藏窗口";
             this.checkBoxHideStart.UseVisualStyleBackColor = true;
             this.checkBoxHideStart.CheckedChanged += new System.EventHandler(this.CheckBoxHideStart_CheckedChanged);
             // 
@@ -75,9 +75,9 @@
             this.checkBoxNotExit.AutoSize = true;
             this.checkBoxNotExit.Location = new System.Drawing.Point(12, 175);
             this.checkBoxNotExit.Name = "checkBoxNotExit";
-            this.checkBoxNotExit.Size = new System.Drawing.Size(144, 16);
+            this.checkBoxNotExit.Size = new System.Drawing.Size(168, 16);
             this.checkBoxNotExit.TabIndex = 7;
-            this.checkBoxNotExit.Text = "点击关闭按钮进入后台";
+            this.checkBoxNotExit.Text = "点击关闭按钮进入后台运行";
             this.checkBoxNotExit.UseVisualStyleBackColor = true;
             this.checkBoxNotExit.CheckedChanged += new System.EventHandler(this.CheckBoxNotExit_CheckedChanged);
             // 
@@ -90,7 +90,6 @@
             this.checkBoxAutoStart.TabIndex = 8;
             this.checkBoxAutoStart.Text = "开机启动";
             this.checkBoxAutoStart.UseVisualStyleBackColor = true;
-            this.checkBoxAutoStart.CheckedChanged += new System.EventHandler(this.CheckBoxAutoStart_CheckedChanged);
             // 
             // textBoxTitle
             // 
