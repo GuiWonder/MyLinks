@@ -1,11 +1,6 @@
+using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MyLinks
@@ -13,8 +8,6 @@ namespace MyLinks
     public partial class Setting : Form
     {
         readonly FormMain f1;
-        readonly string lnkname = "MyLink.lnk";
-        readonly string link;
         public Setting(FormMain form1)
         {
             InitializeComponent();
@@ -37,10 +30,33 @@ namespace MyLinks
                 Location = new Point(x, y);
                 StartPosition = FormStartPosition.Manual;
             }
-            link = Environment.GetFolderPath(Environment.SpecialFolder.Startup) + "\\" + lnkname;
-            checkBoxAutoStart.Checked = System.IO.File.Exists(link);
             checkBoxAutoStart.Click += CheckBoxAutoStart_Click;
             FormClosing += Setting_FormClosing;
+            checkBoxAutoStart.Checked = IsAutoStart(null);
+        }
+
+        private bool IsAutoStart(bool? isOn)
+        {
+            string appPath = Application.ExecutablePath;
+            string appName = Application.ProductName;
+            if (appPath.Contains(" "))
+            {
+                appPath = "\"" + appPath + "\"";
+            }
+            RegistryKey rgk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (rgk == null)
+            {
+                rgk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");
+            }
+            if (isOn == true)
+            {
+                rgk.SetValue(appName, appPath);
+            }
+            if (isOn == false)
+            {
+                rgk.DeleteValue(appName, false);
+            }
+            return rgk.GetValue(appName) != null;
         }
 
         private void Setting_FormClosing(object sender, FormClosingEventArgs e)
@@ -56,13 +72,12 @@ namespace MyLinks
                 e.Cancel = true;
             }
         }
-
-        private void CheckBoxAutoStart_Click(object sender, EventArgs e) => AutoStart(checkBoxAutoStart.Checked);
         private void CheckBoxHideStart_CheckedChanged(object sender, EventArgs e) => f1.hideStart = checkBoxHideStart.Checked;
         private void CheckBoxHideRun_CheckedChanged(object sender, EventArgs e) => f1.hideRun = checkBoxHideRun.Checked;
         private void CheckBoxTopmost_CheckedChanged(object sender, EventArgs e) => f1.TopMost = checkBoxTopmost.Checked;
         private void CheckBoxNotExit_CheckedChanged(object sender, EventArgs e) => f1.noexit = checkBoxNotExit.Checked;
         private void TextBoxTitle_TextChanged(object sender, EventArgs e) => f1.Text = textBoxTitle.Text;
+        private void CheckBoxNoReadLnk_CheckedChanged(object sender, EventArgs e) => f1.noReadLnk = checkBoxNoReadLnk.Checked;
         private void CheckBoxUpTab_CheckedChanged(object sender, EventArgs e)
         {
             f1.tabtop = checkBoxUpTab.Checked;
@@ -77,29 +92,16 @@ namespace MyLinks
                 f1.panel1.Dock = DockStyle.Bottom;
             }
         }
-
-        private void CheckBoxNoReadLnk_CheckedChanged(object sender, EventArgs e) => f1.noReadLnk = checkBoxNoReadLnk.Checked;
-
-        private void AutoStart(bool isAuto)
+        private void CheckBoxAutoStart_Click(object sender, EventArgs e)
         {
             try
             {
-                if (isAuto)
-                {
-                    var shellType = Type.GetTypeFromProgID("WScript.Shell");
-                    dynamic shell = Activator.CreateInstance(shellType);
-                    var shortcut = shell.CreateShortcut(link);
-                    shortcut.TargetPath = Application.ExecutablePath;
-                    //shortcut.Arguments = args;
-                    shortcut.WorkingDirectory = Application.StartupPath;
-                    shortcut.Save();
-                }
-                else
-                {
-                    System.IO.File.Delete(link);
-                }
+                IsAutoStart(checkBoxAutoStart.Checked);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
     }
 }
