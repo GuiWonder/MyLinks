@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,23 +12,28 @@ namespace MyLinks
 {
     public partial class EditIco : Form
     {
-        public EditIco(FileName f1, bool topmost)
+        public EditIco(IcoFileInfo f1, bool topmost)
         {
             InitializeComponent();
             f = f1;
             TopMost = topmost;
             textBoxName.Text = f.Name;
-            textBoxParth.Text = f.Path;
+            textBoxParth.Text = f.FullName;
             textBoxArg.Text = f.Args;
             checkBoxRunAs.Checked = f.RunAsA;
         }
-        public FileName f;
+        public IcoFileInfo f;
 
         private void ButtonOk_Click(object sender, EventArgs e)
         {
-            f.Name = textBoxName.Text;
-            f.Path = textBoxParth.Text;
-            f.Args = textBoxArg.Text;
+            if (string.IsNullOrEmpty(textBoxName.Text.Trim()))
+            {
+                MessageBox.Show("请输入名称。");
+                return;
+            }
+            f.Name = textBoxName.Text.Trim();
+            f.FullName = textBoxParth.Text.Trim();
+            f.Args = textBoxArg.Text.Trim();
             f.RunAsA = checkBoxRunAs.Checked;
             DialogResult = DialogResult.OK;
         }
@@ -37,13 +42,15 @@ namespace MyLinks
 
         private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            using (OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Multiselect = false
-            };
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            })
             {
-                textBoxParth.Text = openFileDialog.FileName;
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    textBoxParth.Text = openFileDialog.FileName;
+                }
             }
         }
     }
