@@ -30,22 +30,22 @@ namespace MyLinks
         {
             tbwidth = 55;
             tbheight = 23;
-
             InitializeComponent();
-            BackColor = Color.White;
             FormClosing += FormMain_FormClosing;
             Load += FormMain_Load;
-            panel1.MouseDown += FormMain_MouseDown;
+            MouseDown += FormMain_MouseDown;
+            panelButton.MouseDown += FormMain_MouseDown;
             Resize += FormMain_Resize;
-            tabControl = new TabControl();
-            tabControl.Alignment = TabAlignment.Bottom;
-            tabControl.ContextMenuStrip = contextMenuStripMain;
-            //tabControl.Dock = DockStyle.Fill;
-            tabControl.ItemSize = new Size(48, 16);
-            tabControl.Location = new Point(0, 0);
-            tabControl.Margin = new Padding(0);
-            tabControl.Padding = new Point(0, 0);
-            //tabControl.Size = new Size(660, 427);
+            tabControl = new TabControl
+            {
+                Alignment = TabAlignment.Bottom,
+                ContextMenuStrip = contextMenuStripMain,
+                //tabControl.Dock = DockStyle.Fill;
+                ItemSize = new Size(48, 16),
+                Location = new Point(0, 0),
+                Margin = new Padding(0),
+                Padding = new Point(0, 0)
+            };
             Controls.Add(tabControl);
             ReadCfg();
             notifyIcon.Text = Text;
@@ -54,8 +54,8 @@ namespace MyLinks
             {
                 buttons[tabControl.SelectedIndex].BackColor = Color.LightBlue;
             }
-            panel1.Dock = tabtop ? DockStyle.Top : DockStyle.Bottom;
-            panel1.Height = tbheight;
+            panelButton.Dock = tabtop ? DockStyle.Top : DockStyle.Bottom;
+            panelButton.Height = tbheight;
             FormMain_Resize(null, null);
         }
 
@@ -64,6 +64,7 @@ namespace MyLinks
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         public static extern bool SendMessage(IntPtr hwnd, int wMsg, int wParam, int lParam);
 
+        #region Event
         private void FormMain_Load(object sender, EventArgs e)
         {
             if (hideStart)
@@ -127,6 +128,17 @@ namespace MyLinks
                 {
                     Hide();
                 }
+            }
+        }
+
+        private void ListView_MouseDown(object sender, MouseEventArgs e)
+        {
+            Point p = ((ListView)sender).PointToClient(MousePosition);
+            ListViewItem toitem = ((ListView)sender).GetItemAt(p.X, p.Y);
+            if (toitem == null)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, 0x0112, 0xF010 + 0x0002, 0);
             }
         }
 
@@ -201,6 +213,7 @@ namespace MyLinks
             }
             tabControl.SelectedIndex = j;
         }
+        #endregion
 
         #region CFG
         private void WriteCfg()
@@ -350,14 +363,12 @@ namespace MyLinks
                         XmlNodeList items = tabs[i].SelectNodes("Data");
                         foreach (XmlNode item in items)
                         {
-                            string name = item.SelectSingleNode("Name").InnerText;
-                            string fullpath = item.SelectSingleNode("FullPath").InnerText;
-                            string args = item.SelectSingleNode("Args").InnerText;
-                            string runas = item.SelectSingleNode("RunAs").InnerText;
-                            IcoFileInfo icoFileInfo = new IcoFileInfo(fullpath);
-                            icoFileInfo.Name = name;
-                            icoFileInfo.Args = args;
-                            icoFileInfo.RunAsA = runas.ToLower() == "true";
+                            IcoFileInfo icoFileInfo = new IcoFileInfo(item.SelectSingleNode("FullPath").InnerText)
+                            {
+                                Name = item.SelectSingleNode("Name").InnerText,
+                                Args = item.SelectSingleNode("Args").InnerText,
+                                RunAsA = item.SelectSingleNode("RunAs").InnerText.ToLower() == "true"
+                            };
                             AddFile(icoFileInfo, i);
                         }
                     }
@@ -371,6 +382,7 @@ namespace MyLinks
         }
         #endregion
 
+        #region Method
         private void RunIcon(string path, string arg, bool runas)
         {
             string dir = System.IO.Path.GetDirectoryName(path);
@@ -401,13 +413,17 @@ namespace MyLinks
             dynamic shortcut = shell.CreateShortcut(item);
             string path = shortcut.TargetPath;
             string args = shortcut.Arguments;
-            IcoFileInfo icoFileInfolk = new IcoFileInfo(item);
-            icoFileInfolk.Args = args;
+            IcoFileInfo icoFileInfolk = new IcoFileInfo(item)
+            {
+                Args = args
+            };
             if (System.IO.File.Exists(path) || System.IO.Directory.Exists(path))
             {
-                IcoFileInfo icoFileInfo = new IcoFileInfo(item);
-                icoFileInfo.Name = icoFileInfolk.Name;
-                icoFileInfo.Args = args;
+                IcoFileInfo icoFileInfo = new IcoFileInfo(item)
+                {
+                    Name = icoFileInfolk.Name,
+                    Args = args
+                };
                 AddFile(icoFileInfo, i);
             }
             else
@@ -439,7 +455,6 @@ namespace MyLinks
 
         private void AddFiles(string[] files)
         {
-            //int i = tabControl.SelectedIndex;
             foreach (string item in files)
             {
                 if (!noReadLnk && item.ToLower().EndsWith(".lnk"))
@@ -476,57 +491,57 @@ namespace MyLinks
             };
             LargeImageList.Add(large);
             SmallImageList.Add(small);
-            ListView listView = new ListView();
-            listView.LargeImageList = large;
-            listView.SmallImageList = small;
-            listView.AllowDrop = true;
-            listView.BorderStyle = BorderStyle.None;
-            listView.Dock = DockStyle.Fill;
-            listView.HideSelection = false;
-            listView.Location = new Point(0, 0);
-            listView.Margin = new Padding(0);
-            listView.Padding = new Padding(0);
-            //listView.Size = new Size(652, 403);
-            listView.MultiSelect = false;
-            //listView.UseCompatibleStateImageBehavior = false;
-            listView.ShowItemToolTips = true;
+            ListView listView = new ListView
+            {
+                LargeImageList = large,
+                SmallImageList = small,
+                AllowDrop = true,
+                BorderStyle = BorderStyle.None,
+                Dock = DockStyle.Fill,
+                HideSelection = false,
+                Location = new Point(0, 0),
+                Margin = new Padding(0),
+                Padding = new Padding(0),
+                MultiSelect = false,
+                //listView.UseCompatibleStateImageBehavior = false;
+                ShowItemToolTips = true
+            };
             listView.DragDrop += ListViews_DragDrop;
             listView.DragOver += ListView_DragOver;
             listView.ItemDrag += ListView_ItemDrag;
             listView.MouseClick += ListViews_MouseClick;
-            //listView.LostFocus += ListView_LostFocus;
-            //listView.DragEnter += ListViews_DragEnter;
-            //listView.MouseDown += ListView_MouseDown;
+            listView.MouseDown += ListView_MouseDown;
             listView.Columns.Add("名称", 100, HorizontalAlignment.Left);
             //listView.Columns.Add("类型", 60, HorizontalAlignment.Left);
             listView.Columns.Add("路径", 300, HorizontalAlignment.Left);
             listView.Columns.Add("参数", 100, HorizontalAlignment.Left);
             listView.Columns.Add("管理员权限", 100, HorizontalAlignment.Left);
             listViews.Add(listView);
-            TabPage tabPage = new TabPage();
+            TabPage tabPage = new TabPage
+            {
+                Location = new Point(0),
+                Margin = new Padding(0),
+                //tabPage.Size = new Size(652, 403);
+                Padding = new Padding(0),
+                Text = pgname
+            };
             tabPage.Controls.Add(listView);
-            tabPage.Location = new Point(0);
-            tabPage.Margin = new Padding(0);
-            //tabPage.Size = new Size(652, 403);
-            //tabPage.TabIndex = 0;
-            tabPage.Padding = new Padding(0);
-            tabPage.Text = pgname;
-            //tabPage.UseVisualStyleBackColor = true;
             tabControl.TabPages.Add(tabPage);
-            Button button = new Button();
-            button.BackColor = Color.White;
-            button.FlatStyle = FlatStyle.Flat;
-            button.Margin = new Padding(0);
-            button.Padding = new Padding(0);
-            button.FlatAppearance.BorderColor = Color.LightBlue;// SystemColors.MenuHighlight;
-            button.Location = new Point(tbwidth * buttons.Count, 0);
-            button.Size = new Size(tbwidth, tbheight);
-            button.Text = pgname;
-            //button.Tag = buttons.Count;
-            button.UseVisualStyleBackColor = false;
+            Button button = new Button
+            {
+                BackColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(0),
+                Padding = new Padding(0),
+                Location = new Point(tbwidth * buttons.Count, 0),
+                Size = new Size(tbwidth, tbheight),
+                Text = pgname,
+                UseVisualStyleBackColor = false
+            };
+            button.FlatAppearance.BorderColor = Color.LightBlue;
             button.Click += new EventHandler(Button_Click);
             buttons.Add(button);
-            panel1.Controls.Add(button);
+            panelButton.Controls.Add(button);
         }
 
         private void RemoveTab(int i)
@@ -542,13 +557,13 @@ namespace MyLinks
 
         private void FitButton()
         {
-            panel1.Controls.Clear();
-            panel1.Height = tbheight;
+            panelButton.Controls.Clear();
+            panelButton.Height = tbheight;
             for (int j = 0; j < buttons.Count; j++)
             {
                 buttons[j].Size = new Size(tbwidth, tbheight);
                 buttons[j].Location = new Point(tbwidth * j, 0);
-                panel1.Controls.Add(buttons[j]);
+                panelButton.Controls.Add(buttons[j]);
                 if (j == tabControl.SelectedIndex)
                 {
                     buttons[j].BackColor = Color.LightBlue;
@@ -560,6 +575,7 @@ namespace MyLinks
             }
             FormMain_Resize(null, null);
         }
+        #endregion
 
         #region MENU
         private void ContextMenuStripMain_Opening(object sender, CancelEventArgs e)
