@@ -75,19 +75,13 @@
     <Compile Include="EditIco.Designer.cs">
       <DependentUpon>EditIco.cs</DependentUpon>
     </Compile>
-    <Compile Include="EditLists.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EditLists.Designer.cs">
-      <DependentUpon>EditLists.cs</DependentUpon>
-    </Compile>
     <Compile Include="EditTab.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="EditTab.Designer.cs">
       <DependentUpon>EditTab.cs</DependentUpon>
     </Compile>
-    <Compile Include="FileInfoList.cs" />
+    <Compile Include="FilesystemIcons.cs" />
     <Compile Include="FormMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -109,9 +103,6 @@
     </Compile>
     <EmbeddedResource Include="EditIco.resx">
       <DependentUpon>EditIco.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="EditLists.resx">
-      <DependentUpon>EditLists.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="EditTab.resx">
       <DependentUpon>EditTab.cs</DependentUpon>
