@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,10 +24,7 @@ namespace MyLinks
             }
         }
 
-        private void ButtonCancel_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
+        private void ButtonCancel_Click(object sender, EventArgs e) => Close();
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
@@ -37,7 +34,7 @@ namespace MyLinks
                 MessageBox.Show(this, "名称不能为空！", "提示", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            name = textBox1.Text;
+            name = s;
             DialogResult = DialogResult.OK;
         }
     }
