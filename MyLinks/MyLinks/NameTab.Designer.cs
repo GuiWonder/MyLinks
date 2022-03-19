@@ -1,4 +1,4 @@
-﻿namespace MyLinks
+namespace MyLinks
 {
     partial class NameTab
     {
