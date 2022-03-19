@@ -24,16 +24,21 @@ namespace MyLinks
                 checkBoxBG.Checked = true;
             }
             TopMost = f1.TopMost;
-            textBoxImg.Text = f1.backimage[i];
+            textBoxImg.Text = f1.backimages[i];
             checkBoxTiled.Checked = f1.listViews[i].BackgroundImageTiled;
             textBoxImg.Enabled = checkBoxBG.Checked;
             checkBoxTiled.Enabled = checkBoxBG.Checked;
             linkLabelBKImage.Enabled = checkBoxBG.Checked;
             textBoxTitle.Text = f1.tabControl.TabPages[i].Text;
-            pictureBox1.BackColor = f1.listViews[i].ForeColor;
+            pictureBoxFore.BackColor = f1.listViews[i].ForeColor;
+            pictureBoxBack.BackColor = f1.listViews[i].BackColor;
         }
 
-        private void TextBoxTitle_TextChanged(object sender, EventArgs e) => f1.tabControl.TabPages[i].Text = textBoxTitle.Text;
+        private void TextBoxTitle_TextChanged(object sender, EventArgs e)
+        {
+            f1.tabControl.TabPages[i].Text = textBoxTitle.Text;
+            f1.buttons[i].Text = textBoxTitle.Text;
+        }
 
         private void CheckBoxBG_CheckedChanged(object sender, EventArgs e)
         {
@@ -43,12 +48,10 @@ namespace MyLinks
                 {
                     try
                     {
-                        f1.listViews[i].BackgroundImage = Image.FromFile(textBoxImg.Text);
+                        SetBKImage(textBoxImg.Text);
                     }
                     catch (Exception)
-                    {
-                        //f1.listViews[i].BackgroundImage = null;
-                    }
+                    { }
                 }
             }
             else
@@ -88,7 +91,18 @@ namespace MyLinks
         {
             if (e.KeyChar == (char)Keys.Return)
             {
-                SetBKImage(textBoxImg.Text);
+                if (!string.IsNullOrWhiteSpace(textBoxImg.Text))
+                {
+                    if (System.IO.File.Exists(textBoxImg.Text.Trim()))
+                    {
+                        SetBKImage(textBoxImg.Text.Trim());
+                    }
+                    else
+                    {
+                        MessageBox.Show(this, "文件读取不存在！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                e.Handled = true;
             }
         }
 
@@ -96,8 +110,11 @@ namespace MyLinks
         {
             try
             {
-                f1.listViews[i].BackgroundImage = Image.FromFile(imgfile);
-                f1.backimage[i] = imgfile;
+                using (Image image = Image.FromFile(imgfile))
+                {
+                    f1.listViews[i].BackgroundImage = image;
+                }
+                f1.backimages[i] = imgfile;
             }
             catch (Exception)
             {
@@ -107,23 +124,28 @@ namespace MyLinks
 
         private void CheckBoxTiled_CheckedChanged(object sender, EventArgs e) => f1.listViews[i].BackgroundImageTiled = checkBoxTiled.Checked;
 
-        private void PictureBox1_Click(object sender, EventArgs e)
+        private void PictureBoxFore_Click(object sender, EventArgs e)
         {
             using (ColorDialog colorDialog = new ColorDialog())
             {
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
-                    Text = colorDialog.Color.ToArgb().ToString();
-                    pictureBox1.BackColor = colorDialog.Color;
+                    pictureBoxFore.BackColor = colorDialog.Color;
                     f1.listViews[i].ForeColor = colorDialog.Color;
                 }
             }
         }
 
-        private void ButtonList_Click(object sender, EventArgs e)
+        private void PictureBoxBack_Click(object sender, EventArgs e)
         {
-            EditLists editLists = new EditLists(f1, i);
-            editLists.ShowDialog(this);
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    pictureBoxBack.BackColor = colorDialog.Color;
+                    f1.listViews[i].BackColor = colorDialog.Color;
+                }
+            }
         }
     }
 }
