@@ -1,6 +1,5 @@
 using Microsoft.Win32;
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace MyLinks
@@ -18,18 +17,13 @@ namespace MyLinks
             checkBoxTopmost.Checked = f1.TopMost;
             checkBoxNotExit.Checked = f1.noexit;
             checkBoxNoReadLnk.Checked = f1.noReadLnk;
-            checkBoxUpTab.Checked = f1.tabtop;
+            comboBoxTabLoac.SelectedIndex = (int)(f1.panelButton.Dock - 1);
             textBoxTitle.Text = f1.Text;
+            checkBoxStateBar.Checked = f1.ShowInTaskbar;
+            checkBoxFormIcon.Checked = f1.ShowIcon;
+            pictureBoxBack.BackColor = f1.panelButton.BackColor;
             textBoxBW.Text = f1.tbwidth.ToString();
             textBoxBH.Text = f1.tbheight.ToString();
-            if (f1.Visible)
-            {
-                int x, y;
-                x = f1.Location.X + (f1.Width / 2) - (Width / 2);
-                y = f1.Location.Y + (f1.Height / 2) - (Height / 2);
-                Location = new Point(x, y);
-                StartPosition = FormStartPosition.Manual;
-            }
             checkBoxAutoStart.Click += CheckBoxAutoStart_Click;
             FormClosing += Setting_FormClosing;
             checkBoxAutoStart.Checked = IsAutoStart(null);
@@ -37,8 +31,8 @@ namespace MyLinks
 
         private bool IsAutoStart(bool? isOn)
         {
-            string appPath = Application.ExecutablePath;
-            string appName = Application.ProductName;
+            string appPath = f1.apppath;
+            string appName = f1.appname;
             if (appPath.Contains(" "))
             {
                 appPath = "\"" + appPath + "\"";
@@ -71,6 +65,7 @@ namespace MyLinks
                 MessageBox.Show(ex.ToString());
                 e.Cancel = true;
             }
+            f1.ShowInTaskbar = checkBoxStateBar.Checked;
         }
         private void CheckBoxHideStart_CheckedChanged(object sender, EventArgs e) => f1.hideStart = checkBoxHideStart.Checked;
         private void CheckBoxHideRun_CheckedChanged(object sender, EventArgs e) => f1.hideRun = checkBoxHideRun.Checked;
@@ -78,20 +73,6 @@ namespace MyLinks
         private void CheckBoxNotExit_CheckedChanged(object sender, EventArgs e) => f1.noexit = checkBoxNotExit.Checked;
         private void TextBoxTitle_TextChanged(object sender, EventArgs e) => f1.Text = textBoxTitle.Text;
         private void CheckBoxNoReadLnk_CheckedChanged(object sender, EventArgs e) => f1.noReadLnk = checkBoxNoReadLnk.Checked;
-        private void CheckBoxUpTab_CheckedChanged(object sender, EventArgs e)
-        {
-            f1.tabtop = checkBoxUpTab.Checked;
-            if (f1.tabtop)
-            {
-                f1.tabControl.Location = new Point(-4, f1.tbheight - 4);
-                f1.panel1.Dock = DockStyle.Top;
-            }
-            else
-            {
-                f1.tabControl.Location = new Point(-4, -4);
-                f1.panel1.Dock = DockStyle.Bottom;
-            }
-        }
         private void CheckBoxAutoStart_Click(object sender, EventArgs e)
         {
             try
@@ -101,6 +82,29 @@ namespace MyLinks
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void CheckBoxFormIcon_CheckedChanged(object sender, EventArgs e)
+        {
+            f1.ShowIcon = checkBoxFormIcon.Checked;
+        }
+
+        private void ComboBoxTabLoac_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            f1.panelButton.Dock = (DockStyle)(comboBoxTabLoac.SelectedIndex + 1);
+            f1.FitButton();
+        }
+
+        private void PictureBoxBack_Click(object sender, EventArgs e)
+        {
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    pictureBoxBack.BackColor = colorDialog.Color;
+                    f1.panelButton.BackColor = colorDialog.Color;
+                }
             }
         }
     }
