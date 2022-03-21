@@ -1,11 +1,6 @@
-﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyLinks
 {
@@ -16,8 +11,8 @@ namespace MyLinks
         private const int SHGFI_LARGEICON = 0x0;
 
         #region PublicIcons
-        public static Icon ICON_DIRECTORY_16x = ExtractIconFromFileX16(@"C:\Windows\system32\shell32.dll", 3); //Icon auch in Shell32.dll,3
-        public static Icon ICON_DIRECTORY_32x = ExtractIconFromFileX32(@"C:\Windows\system32\shell32.dll", 3); //Icon auch in Shell32.dll,3
+        //public static Icon ICON_DIRECTORY_16x = ExtractIconFromFileX16(@"C:\Windows\system32\shell32.dll", 3); //Icon auch in Shell32.dll,3
+        //public static Icon ICON_DIRECTORY_32x = ExtractIconFromFileX32(@"C:\Windows\system32\shell32.dll", 3); //Icon auch in Shell32.dll,3
         public static Icon ICON_FILE_16x = ExtractIconFromFileX16(@"C:\Windows\system32\shell32.dll", 0);
         public static Icon ICON_FILE_32x = ExtractIconFromFileX32(@"C:\Windows\system32\shell32.dll", 0);
         //public static Icon ICON_NETWORK_16x = ExtractIconFromFileX16(@"C:\Windows\system32\shell32.dll", 17);
@@ -42,7 +37,7 @@ namespace MyLinks
             }
             catch (Exception)
             {
-                icon = ICON_FILE_16x;
+                return ICON_FILE_16x;
             }
             if (icon == null)
             {
@@ -65,7 +60,7 @@ namespace MyLinks
             }
             catch (Exception)
             {
-                icon = ICON_FILE_32x;
+                return ICON_FILE_32x;
             }
             if (icon == null)
             {
@@ -161,6 +156,7 @@ namespace MyLinks
             return myIcon;
         }
 
+        /*
         /// <summary>
         /// Gibt das Icon anhand der Extension aus
         /// </summary>
@@ -256,7 +252,7 @@ namespace MyLinks
             }
             return imgicon;
         }
-
+        */
         #endregion
     }
 }
