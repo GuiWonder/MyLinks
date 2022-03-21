@@ -57,7 +57,7 @@ namespace MyLinks
             this.设置ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.退出ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.panel1 = new System.Windows.Forms.Panel();
+            this.panelButton = new System.Windows.Forms.Panel();
             this.contextMenuStripMain.SuspendLayout();
             this.contextMenuStripNoti.SuspendLayout();
             this.SuspendLayout();
@@ -267,32 +267,31 @@ namespace MyLinks
             // 
             this.notifyIcon.ContextMenuStrip = this.contextMenuStripNoti;
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
-            this.notifyIcon.Text = "MyLinks";
             this.notifyIcon.Visible = true;
             this.notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon_MouseClick);
             // 
-            // panel1
+            // panelButton
             // 
-            this.panel1.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 404);
-            this.panel1.Margin = new System.Windows.Forms.Padding(0);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(660, 23);
-            this.panel1.TabIndex = 2;
+            this.panelButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.panelButton.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelButton.Location = new System.Drawing.Point(0, 338);
+            this.panelButton.Margin = new System.Windows.Forms.Padding(0);
+            this.panelButton.Name = "panelButton";
+            this.panelButton.Size = new System.Drawing.Size(584, 23);
+            this.panelButton.TabIndex = 2;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(660, 427);
+            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ClientSize = new System.Drawing.Size(584, 361);
             this.ContextMenuStrip = this.contextMenuStripMain;
-            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panelButton);
             this.DoubleBuffered = true;
             this.Name = "FormMain";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "MyLinks";
             this.contextMenuStripMain.ResumeLayout(false);
             this.contextMenuStripNoti.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -327,7 +326,7 @@ namespace MyLinks
         private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 目录ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 自定义ToolStripMenuItem;
-        public System.Windows.Forms.Panel panel1;
+        public System.Windows.Forms.Panel panelButton;
     }
 }
 
