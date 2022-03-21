@@ -9,54 +9,74 @@ namespace MyLinks
 {
     public partial class FormMain : Form
     {
-        private readonly string cfgFile = "MyLinks.xml";
         public List<string> backimages = new List<string>();
         public List<ListView> listViews = new List<ListView>();
         public List<Button> buttons = new List<Button>();
-        public List<ImageList> LargeImageList = new List<ImageList>();
-        public List<ImageList> SmallImageList = new List<ImageList>();
+        public List<ImageList> largeImageLists = new List<ImageList>();
+        public List<ImageList> smallImageLists = new List<ImageList>();
         public TabControl tabControl;
         public bool noexit;
         private bool goexit = false;
         public bool hideStart;
         public bool hideRun;
         public bool noReadLnk;
-        public bool tabtop;
         public int tbwidth;
         public int tbheight;
+        public readonly string apppath;
+        public readonly string appname;
+        public readonly string appdir;
+        private readonly string cfgFile;
+        private int width;
+        private int height;
+        private int locationx;
+        private int locationy;
         private ListViewItem dragMove;
 
         public FormMain()
         {
+            apppath = Application.ExecutablePath;
+            appdir = Application.StartupPath.TrimEnd('\\');
+            appname = System.IO.Path.GetFileNameWithoutExtension(apppath);
+            cfgFile = appdir + "\\" + appname + ".xml";
             tbwidth = 55;
             tbheight = 23;
             InitializeComponent();
-            FormClosing += FormMain_FormClosing;
             Load += FormMain_Load;
+            FormClosing += FormMain_FormClosing;
             MouseDown += FormMain_MouseDown;
             panelButton.MouseDown += FormMain_MouseDown;
             Resize += FormMain_Resize;
+            LocationChanged += FormMain_LocationChanged;
             tabControl = new TabControl
             {
                 Alignment = TabAlignment.Bottom,
                 ContextMenuStrip = contextMenuStripMain,
                 //tabControl.Dock = DockStyle.Fill;
                 ItemSize = new Size(48, 16),
-                Location = new Point(0, 0),
+                //Location = new Point(0, 0),
                 Margin = new Padding(0),
                 Padding = new Point(0, 0)
             };
             Controls.Add(tabControl);
             ReadCfg();
             notifyIcon.Text = Text;
-            //notifyIcon.Icon = FilesystemIcons.ICON_MY_16x;
             if (tabControl.SelectedIndex > -1)
             {
                 buttons[tabControl.SelectedIndex].BackColor = Color.LightBlue;
             }
-            panelButton.Dock = tabtop ? DockStyle.Top : DockStyle.Bottom;
             panelButton.Height = tbheight;
-            FormMain_Resize(null, null);
+            panelButton.Width = tbwidth;
+            string icofile = appdir + "\\" + appname + ".ico";
+            if (System.IO.File.Exists(icofile))
+            {
+                try
+                {
+                    notifyIcon.Icon = new Icon(icofile);
+                }
+                catch { }
+            }
+            Icon = notifyIcon.Icon;
+            FitButton();
         }
 
         [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -76,15 +96,48 @@ namespace MyLinks
 
         private void FormMain_Resize(object sender, EventArgs e)
         {
-            tabControl.Width = ClientSize.Width + 8;
-            tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
-            if (tabtop)
+            switch (panelButton.Dock)
             {
-                tabControl.Location = new Point(-4, tbheight - 4);
+                case DockStyle.Top:
+                    tabControl.Width = ClientSize.Width + 8;
+                    tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
+                    tabControl.Location = new Point(-4, tbheight - 4);
+                    break;
+                case DockStyle.Bottom:
+                    tabControl.Width = ClientSize.Width + 8;
+                    tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
+                    tabControl.Location = new Point(-4, -4);
+                    break;
+                case DockStyle.Left:
+                    tabControl.Width = ClientSize.Width + 8 - tbwidth;
+                    tabControl.Height = ClientSize.Height + 8 + 16;
+                    tabControl.Location = new Point(-4 + tbwidth, -4);
+                    break;
+                case DockStyle.Right:
+                    tabControl.Width = ClientSize.Width + 8 - tbwidth;
+                    tabControl.Height = ClientSize.Height + 8 + 16;
+                    tabControl.Location = new Point(-4, -4);
+                    break;
+                default:
+                    break;
             }
-            else
+            if (WindowState == FormWindowState.Normal)
             {
-                tabControl.Location = new Point(-4, -4);
+                width = Width;
+                height = Height;
+            }
+            else if (!ShowInTaskbar && WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+            }
+        }
+
+        private void FormMain_LocationChanged(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Normal)
+            {
+                locationx = Location.X;
+                locationy = Location.Y;
             }
         }
 
@@ -195,23 +248,36 @@ namespace MyLinks
         private void Button_Click(object sender, EventArgs e)
         {
             int j = tabControl.SelectedIndex;
-            for (int i = 0; i < buttons.Count; i++)
+            int bi = buttons.IndexOf((Button)sender);
+            if (bi != j)
             {
-                if (buttons[i] == sender)
+                tabControl.SelectedIndex = bi;
+                foreach (Button item in buttons)
                 {
-                    j = i;
-                    buttons[i].BackColor = Color.LightBlue;
-                }
-                else
-                {
-                    buttons[i].BackColor = Color.White;
+                    if (item == sender)
+                    {
+                        item.BackColor = Color.LightBlue;
+                    }
+                    else
+                    {
+                        item.BackColor = Color.White;
+                    }
                 }
             }
-            if (j == tabControl.SelectedIndex)
+
+        }
+
+        private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
             {
-                return;
+                Show();
+                if (WindowState == FormWindowState.Minimized)
+                {
+                    WindowState = FormWindowState.Normal;
+                }
+                Activate();
             }
-            tabControl.SelectedIndex = j;
         }
         #endregion
 
@@ -225,18 +291,27 @@ namespace MyLinks
             doc.AppendChild(cfg);
             XmlElement set = doc.CreateElement("Setting");
             cfg.AppendChild(set);
+            XmlElement title = doc.CreateElement("Title");
+            title.InnerText = Text;
+            set.AppendChild(title);
             XmlElement h = doc.CreateElement("Height");
-            h.InnerText = Height.ToString();
+            h.InnerText = height.ToString();
             set.AppendChild(h);
             XmlElement w = doc.CreateElement("Width");
-            w.InnerText = Width.ToString();
+            w.InnerText = width.ToString();
             set.AppendChild(w);
             XmlElement lx = doc.CreateElement("LocationX");
-            lx.InnerText = Location.X.ToString();
+            lx.InnerText = locationx.ToString();
             set.AppendChild(lx);
             XmlElement ly = doc.CreateElement("LocationY");
-            ly.InnerText = Location.Y.ToString();
+            ly.InnerText = locationy.ToString();
             set.AppendChild(ly);
+            XmlElement statusBar = doc.CreateElement("StatusBar");
+            statusBar.InnerText = ShowInTaskbar.ToString();
+            set.AppendChild(statusBar);
+            XmlElement showicon = doc.CreateElement("WindowIcon");
+            showicon.InnerText = ShowIcon.ToString();
+            set.AppendChild(showicon);
             XmlElement hide = doc.CreateElement("HideStart");
             hide.InnerText = hideStart.ToString();
             set.AppendChild(hide);
@@ -249,15 +324,15 @@ namespace MyLinks
             XmlElement noex = doc.CreateElement("NotExit");
             noex.InnerText = noexit.ToString();
             set.AppendChild(noex);
-            XmlElement title = doc.CreateElement("Title");
-            title.InnerText = Text;
-            set.AppendChild(title);
             XmlElement nordlnk = doc.CreateElement("NoReadLnk");
             nordlnk.InnerText = noReadLnk.ToString();
             set.AppendChild(nordlnk);
-            XmlElement tbtop = doc.CreateElement("TableToTop");
-            tbtop.InnerText = tabtop.ToString();
-            set.AppendChild(tbtop);
+            XmlElement tbloc = doc.CreateElement("TableLocation");
+            tbloc.InnerText = ((int)panelButton.Dock).ToString();
+            set.AppendChild(tbloc);
+            XmlElement tbbak = doc.CreateElement("TableBackColor");
+            tbbak.InnerText = panelButton.BackColor.ToArgb().ToString();
+            set.AppendChild(tbbak);
             XmlElement tbindex = doc.CreateElement("TableIndex");
             tbindex.InnerText = tabControl.SelectedIndex.ToString();
             set.AppendChild(tbindex);
@@ -312,16 +387,19 @@ namespace MyLinks
         {
             if (!System.IO.File.Exists(cfgFile))
             {
-                StartPosition = FormStartPosition.CenterScreen;
+                LoadDefault();
                 return;
             }
             try
             {
                 XmlDocument doc = new XmlDocument();
                 doc.Load(cfgFile);
+                Text = doc.SelectSingleNode("Config/Setting/Title").InnerText;
                 Height = int.Parse(doc.SelectSingleNode("Config/Setting/Height").InnerText);
                 Width = int.Parse(doc.SelectSingleNode("Config/Setting/Width").InnerText);
                 int lx = int.Parse(doc.SelectSingleNode("Config/Setting/LocationX").InnerText);
+                ShowInTaskbar = bool.Parse(doc.SelectSingleNode("Config/Setting/StatusBar").InnerText);
+                ShowIcon = bool.Parse(doc.SelectSingleNode("Config/Setting/WindowIcon").InnerText);
                 int ly = int.Parse(doc.SelectSingleNode("Config/Setting/LocationY").InnerText);
                 hideStart = bool.Parse(doc.SelectSingleNode("Config/Setting/HideStart").InnerText);
                 hideRun = bool.Parse(doc.SelectSingleNode("Config/Setting/HideRun").InnerText);
@@ -330,18 +408,25 @@ namespace MyLinks
                 noReadLnk = bool.Parse(doc.SelectSingleNode("Config/Setting/NoReadLnk").InnerText);
                 tbwidth = int.Parse(doc.SelectSingleNode("Config/Setting/TableWidth").InnerText);
                 tbheight = int.Parse(doc.SelectSingleNode("Config/Setting/TableHeight").InnerText);
-                Text = doc.SelectSingleNode("Config/Setting/Title").InnerText;
-                //tabControl.SelectedIndex = int.Parse(doc.SelectSingleNode("Config/Setting/TableIndex").InnerText);
-                if (lx < 0)
+                if (lx + Width <= 0)
                 {
                     lx = 0;
                 }
-                if (ly < 0)
+                if (lx >= Screen.PrimaryScreen.Bounds.Width)
+                {
+                    lx = Screen.PrimaryScreen.Bounds.Width - Width;
+                }
+                if (ly + Width <= 0)
                 {
                     ly = 0;
                 }
+                if (ly >= Screen.PrimaryScreen.Bounds.Height)
+                {
+                    ly = Screen.PrimaryScreen.Bounds.Height - Height;
+                }
                 Location = new Point(lx, ly);
-                tabtop = bool.Parse(doc.SelectSingleNode("Config/Setting/TableToTop").InnerText);
+                panelButton.Dock = (DockStyle)int.Parse(doc.SelectSingleNode("Config/Setting/TableLocation").InnerText);
+                panelButton.BackColor = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/TableBackColor").InnerText));
                 using (XmlNodeList tabs = doc.SelectNodes("Config/Datas/Table"))
                 {
                     for (int i = 0; i < tabs.Count; i++)
@@ -377,8 +462,15 @@ namespace MyLinks
             }
             catch (Exception)
             {
-                StartPosition = FormStartPosition.CenterScreen;
+                LoadDefault();
             }
+        }
+
+        private void LoadDefault()
+        {
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = appname;
+            notifyIcon.Text = appname;
         }
         #endregion
 
@@ -419,7 +511,7 @@ namespace MyLinks
             };
             if (System.IO.File.Exists(path) || System.IO.Directory.Exists(path))
             {
-                IcoFileInfo icoFileInfo = new IcoFileInfo(item)
+                IcoFileInfo icoFileInfo = new IcoFileInfo(path)
                 {
                     Name = icoFileInfolk.Name,
                     Args = args
@@ -434,11 +526,13 @@ namespace MyLinks
 
         private void AddFile(IcoFileInfo icoInfoFile, int i)
         {
-            LargeImageList[i].Images.Add(FilesystemIcons.LargeIcon(icoInfoFile.FullName));
-            SmallImageList[i].Images.Add(FilesystemIcons.SmallIcon(icoInfoFile.FullName));
-            ListViewItem item = new ListViewItem();
-            item.Text = icoInfoFile.Name;
-            item.ImageIndex = LargeImageList[i].Images.Count - 1;
+            largeImageLists[i].Images.Add(FilesystemIcons.LargeIcon(icoInfoFile.FullName));
+            smallImageLists[i].Images.Add(FilesystemIcons.SmallIcon(icoInfoFile.FullName));
+            ListViewItem item = new ListViewItem
+            {
+                Text = icoInfoFile.Name,
+                ImageIndex = largeImageLists[i].Images.Count - 1
+            };
             //item.SubItems.Add(icoInfoFile.Type);
             item.SubItems.Add(icoInfoFile.FullName);
             item.SubItems.Add(icoInfoFile.Args);
@@ -489,8 +583,8 @@ namespace MyLinks
                 ImageSize = new Size(16, 16),
                 ColorDepth = ColorDepth.Depth32Bit
             };
-            LargeImageList.Add(large);
-            SmallImageList.Add(small);
+            largeImageLists.Add(large);
+            smallImageLists.Add(small);
             ListView listView = new ListView
             {
                 LargeImageList = large,
@@ -533,7 +627,7 @@ namespace MyLinks
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(0),
                 Padding = new Padding(0),
-                Location = new Point(tbwidth * buttons.Count, 0),
+                //Location = new Point(tbwidth * buttons.Count, 0),
                 Size = new Size(tbwidth, tbheight),
                 Text = pgname,
                 UseVisualStyleBackColor = false
@@ -548,21 +642,29 @@ namespace MyLinks
         {
             backimages.RemoveAt(i);
             listViews.RemoveAt(i);
-            LargeImageList.RemoveAt(i);
-            SmallImageList.RemoveAt(i);
+            largeImageLists.RemoveAt(i);
+            smallImageLists.RemoveAt(i);
             tabControl.TabPages.RemoveAt(i);
             buttons.RemoveAt(i);
             FitButton();
         }
 
-        private void FitButton()
+        public void FitButton()
         {
-            panelButton.Controls.Clear();
+            panelButton.Width = tbwidth;
             panelButton.Height = tbheight;
+            panelButton.Controls.Clear();
             for (int j = 0; j < buttons.Count; j++)
             {
                 buttons[j].Size = new Size(tbwidth, tbheight);
-                buttons[j].Location = new Point(tbwidth * j, 0);
+                if (panelButton.Dock == DockStyle.Top || panelButton.Dock == DockStyle.Bottom)
+                {
+                    buttons[j].Location = new Point(tbwidth * j, 0);
+                }
+                else
+                {
+                    buttons[j].Location = new Point(0, tbheight * j);
+                }
                 panelButton.Controls.Add(buttons[j]);
                 if (j == tabControl.SelectedIndex)
                 {
@@ -591,19 +693,6 @@ namespace MyLinks
             添加ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
             清空ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0 && listViews[tabControl.SelectedIndex].Items.Count > 0; ;
             类别设置ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-        }
-
-        private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                Show();
-                if (WindowState == FormWindowState.Minimized)
-                {
-                    WindowState = FormWindowState.Normal;
-                }
-                Activate();
-            }
         }
 
         private void 大图标ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.LargeIcon;
@@ -639,8 +728,9 @@ namespace MyLinks
 
         private void 自定义ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (EditIco editIco = new EditIco(new IcoFileInfo(""), TopMost))
+            using (EditIco editIco = new EditIco(new IcoFileInfo("")))
             {
+                editIco.TopMost = TopMost;
                 if (editIco.ShowDialog() == DialogResult.OK)
                 {
                     AddFile(editIco.f, tabControl.SelectedIndex);
@@ -696,6 +786,8 @@ namespace MyLinks
             if (listViews[tabControl.SelectedIndex].Items.Count >= 1 && MessageBox.Show(this, "确定要删除所有项目？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 listViews[tabControl.SelectedIndex].Items.Clear();
+                largeImageLists[tabControl.SelectedIndex].Images.Clear();
+                smallImageLists[tabControl.SelectedIndex].Images.Clear();
             }
         }
 
@@ -735,14 +827,15 @@ namespace MyLinks
                     Args = listViews[i1].SelectedItems[0].SubItems[2].Text,
                     RunAsA = listViews[i1].SelectedItems[0].SubItems[3].Text.ToLower() == "true"
                 };
-                using (EditIco editIco = new EditIco(f1, TopMost))
+                using (EditIco editIco = new EditIco(f1))
                 {
+                    editIco.TopMost = TopMost;
                     if (editIco.ShowDialog() == DialogResult.OK)
                     {
                         if (listViews[i1].Items[i].SubItems[1].Text != editIco.f.FullName)
                         {
-                            LargeImageList[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.LargeIcon(editIco.f.FullName).ToBitmap();
-                            SmallImageList[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.SmallIcon(editIco.f.FullName).ToBitmap();
+                            largeImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.LargeIcon(editIco.f.FullName).ToBitmap();
+                            smallImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.SmallIcon(editIco.f.FullName).ToBitmap();
                         }
                         listViews[i1].Items[i].Text = editIco.f.Name;
                         listViews[i1].Items[i].SubItems[1].Text = editIco.f.FullName;
@@ -791,12 +884,17 @@ namespace MyLinks
             int h1 = tbheight;
             using (Setting setting = new Setting(this))
             {
+                if (sender == 设置ToolStripMenuItem)
+                {
+                    setting.StartPosition = FormStartPosition.CenterParent;
+                }
                 setting.ShowDialog();
             }
             if (w1 != tbwidth || h1 != tbheight)
             {
                 FitButton();
             }
+            Activate();
             WriteCfg();
             notifyIcon.Text = Text;
         }
