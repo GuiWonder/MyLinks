@@ -23,27 +23,20 @@ namespace MyLinks
         //public static Icon ICON_NETWORKFOLDER_32x = ExtractIconFromFileX32(@"C:\Windows\system32\shell32.dll", 275);
         #endregion
 
-        //public static Icon ICON_MY_16x = ExtractIconFromFileX16(@"C:\Windows\system32\imageres.dll", 101); //Icon auch in Shell32.dll,3
         public static Icon SmallIcon(string pfad)
         {
             if (string.IsNullOrEmpty(pfad))
             {
                 return ICON_FILE_16x;
             }
-            Icon icon;
             try
             {
-                icon = GetSmallIcon(pfad);
+                return GetSmallIcon(pfad) ?? ICON_FILE_16x;
             }
             catch (Exception)
             {
                 return ICON_FILE_16x;
             }
-            if (icon == null)
-            {
-                return ICON_FILE_16x;
-            }
-            return icon;
         }
 
         public static Icon LargeIcon(string pfad)
@@ -52,23 +45,15 @@ namespace MyLinks
             {
                 return ICON_FILE_32x;
             }
-
-            Icon icon;
             try
             {
-                icon = GetLargeIcon(pfad);
+                return GetLargeIcon(pfad) ?? ICON_FILE_32x;
             }
             catch (Exception)
             {
                 return ICON_FILE_32x;
             }
-            if (icon == null)
-            {
-                return ICON_FILE_32x;
-            }
-            return icon;
         }
-
 
         [DllImport("shell32.dll", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
         public static extern IntPtr SHGetFileInfo(string pszPath, int dwFileAttributes, ref SHFILEINFO psfi, int cbFileInfo, int uFlags);
@@ -88,15 +73,12 @@ namespace MyLinks
             public string szTypeName;
         }
 
-
         #region PrivateMethods
         private static Icon ExtractIconFromFileX16(string file, int iconindex)
         {
-            IntPtr large;
-            IntPtr small;
             try
             {
-                ExtractIconEx(file, iconindex, out large, out small, 1);
+                ExtractIconEx(file, iconindex, out IntPtr large, out IntPtr small, 1);
                 return Icon.FromHandle(small);
             }
             catch (Exception)
@@ -107,11 +89,9 @@ namespace MyLinks
 
         private static Icon ExtractIconFromFileX32(string file, int iconindex)
         {
-            IntPtr large;
-            IntPtr small;
             try
             {
-                ExtractIconEx(file, iconindex, out large, out small, 1);
+                ExtractIconEx(file, iconindex, out IntPtr large, out IntPtr small, 1);
                 return Icon.FromHandle(large);
             }
             catch (Exception)
@@ -129,14 +109,13 @@ namespace MyLinks
         /// <returns></returns>
         public static Icon GetSmallIcon(string pfad)
         {
-            IntPtr hImgSmall = default(IntPtr);
+            //IntPtr hImgSmall = default(IntPtr);
             //The handle to the system image list.
             SHFILEINFO shinfo = new SHFILEINFO();
             shinfo.szDisplayName = new string((char)0, 260);
             shinfo.szTypeName = new string((char)0, 80);
-            hImgSmall = SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_SMALLICON);
-            System.Drawing.Icon myIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon);
-            return myIcon;
+            SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_SMALLICON);
+            return Icon.FromHandle(shinfo.hIcon);
         }
 
         /// <summary>
@@ -146,14 +125,13 @@ namespace MyLinks
         /// <returns></returns>
         public static Icon GetLargeIcon(string pfad)
         {
-            IntPtr hImgSmall = default(IntPtr);
+            //IntPtr hImgSmall = default(IntPtr);
             //The handle to the system image list.
             SHFILEINFO shinfo = new SHFILEINFO();
             shinfo.szDisplayName = new string((char)0, 260);
             shinfo.szTypeName = new string((char)0, 80);
-            hImgSmall = SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_LARGEICON);
-            System.Drawing.Icon myIcon = System.Drawing.Icon.FromHandle(shinfo.hIcon);
-            return myIcon;
+            SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_LARGEICON);
+            return Icon.FromHandle(shinfo.hIcon);
         }
 
         /*
