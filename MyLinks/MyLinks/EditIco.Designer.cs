@@ -1,4 +1,4 @@
-namespace MyLinks
+namespace Launcher
 {
     partial class EditIco
     {
@@ -42,7 +42,7 @@ namespace MyLinks
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(55, 220);
+            this.buttonOk.Location = new System.Drawing.Point(63, 205);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(75, 23);
             this.buttonOk.TabIndex = 0;
@@ -53,7 +53,7 @@ namespace MyLinks
             // buttonCanc
             // 
             this.buttonCanc.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCanc.Location = new System.Drawing.Point(262, 220);
+            this.buttonCanc.Location = new System.Drawing.Point(275, 205);
             this.buttonCanc.Name = "buttonCanc";
             this.buttonCanc.Size = new System.Drawing.Size(75, 23);
             this.buttonCanc.TabIndex = 1;
@@ -90,14 +90,14 @@ namespace MyLinks
             // 
             // textBoxName
             // 
-            this.textBoxName.Location = new System.Drawing.Point(55, 12);
+            this.textBoxName.Location = new System.Drawing.Point(48, 12);
             this.textBoxName.Name = "textBoxName";
             this.textBoxName.Size = new System.Drawing.Size(325, 21);
             this.textBoxName.TabIndex = 5;
             // 
             // textBoxParth
             // 
-            this.textBoxParth.Location = new System.Drawing.Point(55, 51);
+            this.textBoxParth.Location = new System.Drawing.Point(48, 51);
             this.textBoxParth.Multiline = true;
             this.textBoxParth.Name = "textBoxParth";
             this.textBoxParth.Size = new System.Drawing.Size(325, 66);
@@ -105,7 +105,7 @@ namespace MyLinks
             // 
             // textBoxArg
             // 
-            this.textBoxArg.Location = new System.Drawing.Point(55, 136);
+            this.textBoxArg.Location = new System.Drawing.Point(48, 136);
             this.textBoxArg.Name = "textBoxArg";
             this.textBoxArg.Size = new System.Drawing.Size(325, 21);
             this.textBoxArg.TabIndex = 7;
@@ -123,7 +123,7 @@ namespace MyLinks
             // linkLabel1
             // 
             this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(381, 54);
+            this.linkLabel1.Location = new System.Drawing.Point(376, 54);
             this.linkLabel1.Name = "linkLabel1";
             this.linkLabel1.Size = new System.Drawing.Size(29, 12);
             this.linkLabel1.TabIndex = 9;
@@ -137,7 +137,7 @@ namespace MyLinks
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCanc;
-            this.ClientSize = new System.Drawing.Size(417, 270);
+            this.ClientSize = new System.Drawing.Size(408, 244);
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.checkBoxRunAs);
             this.Controls.Add(this.textBoxArg);
