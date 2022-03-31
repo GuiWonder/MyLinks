@@ -1,6 +1,6 @@
 namespace MyLinks
 {
-    partial class NameTab
+    partial class InputName
     {
         /// <summary>
         /// Required designer variable.
@@ -45,14 +45,14 @@ namespace MyLinks
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(34, 47);
+            this.textBox1.Location = new System.Drawing.Point(23, 43);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(183, 21);
+            this.textBox1.Size = new System.Drawing.Size(213, 21);
             this.textBox1.TabIndex = 1;
             // 
             // buttonOK
             // 
-            this.buttonOK.Location = new System.Drawing.Point(12, 91);
+            this.buttonOK.Location = new System.Drawing.Point(23, 91);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 2;
@@ -75,7 +75,7 @@ namespace MyLinks
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
-            this.ClientSize = new System.Drawing.Size(265, 142);
+            this.ClientSize = new System.Drawing.Size(254, 132);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.textBox1);
