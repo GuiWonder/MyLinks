@@ -30,6 +30,11 @@ namespace MyLinks
         private int height;
         private int locationx;
         private int locationy;
+        //public Color colorB1 = Color.White;
+        public Color colorF1 = Color.Black;
+        public Color colorB2 = Color.LightBlue;
+        public Color colorF2 = Color.Black;
+
         private ListViewItem dragMove;
 
         public FormMain()
@@ -60,10 +65,10 @@ namespace MyLinks
             Controls.Add(tabControl);
             ReadCfg();
             notifyIcon.Text = Text;
-            if (tabControl.SelectedIndex > -1)
-            {
-                buttons[tabControl.SelectedIndex].BackColor = Color.LightBlue;
-            }
+            //if (tabControl.SelectedIndex > -1)
+            //{
+            //    buttons[tabControl.SelectedIndex].BackColor = Color.LightBlue;
+            //}
             panelButton.Height = tbheight;
             panelButton.Width = tbwidth;
             string icofile = appdir + "\\" + appname + ".ico";
@@ -177,7 +182,7 @@ namespace MyLinks
                     MessageBox.Show(exception.Message);
                     return;
                 }
-                if (hideRun)
+                if (hideRun == !(ModifierKeys == Keys.Control))
                 {
                     Hide();
                 }
@@ -232,7 +237,6 @@ namespace MyLinks
                     {
                         ((ListView)sender).Items.RemoveAt(fritem.Index);
                         ((ListView)sender).Items.Insert(toitem.Index + 1, fritem);
-
                     }
                     View view = ((ListView)sender).View;
                     if (view != View.Details && view != View.List)
@@ -256,12 +260,16 @@ namespace MyLinks
                 {
                     if (item == sender)
                     {
-                        item.BackColor = Color.LightBlue;
+                        //item.BackColor = Color.LightBlue;
+                        item.ForeColor = colorF2;
+                        item.BackColor = colorB2;// Color.LightBlue;
                     }
                     else
                     {
-                        item.BackColor = Color.White;
+                        item.BackColor = Color.Transparent;// Color.White;
+                        item.ForeColor = colorF1;
                     }
+                    item.FlatAppearance.BorderColor = colorB2;
                 }
             }
 
@@ -327,24 +335,33 @@ namespace MyLinks
             XmlElement nordlnk = doc.CreateElement("NoReadLnk");
             nordlnk.InnerText = noReadLnk.ToString();
             set.AppendChild(nordlnk);
-            XmlElement tbloc = doc.CreateElement("TableLocation");
+            XmlElement tbloc = doc.CreateElement("LabelLocation");
             tbloc.InnerText = ((int)panelButton.Dock).ToString();
             set.AppendChild(tbloc);
-            XmlElement tbbak = doc.CreateElement("TableBackColor");
-            tbbak.InnerText = panelButton.BackColor.ToArgb().ToString();
-            set.AppendChild(tbbak);
-            XmlElement tbindex = doc.CreateElement("TableIndex");
+            XmlElement tbbak1 = doc.CreateElement("LabelBackColor1");
+            tbbak1.InnerText = panelButton.BackColor.ToArgb().ToString();
+            set.AppendChild(tbbak1);
+            XmlElement tbbak2 = doc.CreateElement("LabelBackColor2");
+            tbbak2.InnerText = colorB2.ToArgb().ToString();
+            set.AppendChild(tbbak2);
+            XmlElement tbfore1 = doc.CreateElement("LabelForeColor1");
+            tbfore1.InnerText = colorF1.ToArgb().ToString();
+            set.AppendChild(tbfore1);
+            XmlElement tbfore2 = doc.CreateElement("LabelForeColor2");
+            tbfore2.InnerText = colorF2.ToArgb().ToString();
+            set.AppendChild(tbfore2);
+            XmlElement tbindex = doc.CreateElement("PageIndex");
             tbindex.InnerText = tabControl.SelectedIndex.ToString();
             set.AppendChild(tbindex);
-            XmlElement tbw = doc.CreateElement("TableWidth");
+            XmlElement tbw = doc.CreateElement("LabelWidth");
             tbw.InnerText = tbwidth.ToString();
             set.AppendChild(tbw);
-            XmlElement tbh = doc.CreateElement("TableHeight");
+            XmlElement tbh = doc.CreateElement("LabelHeight");
             tbh.InnerText = tbheight.ToString();
             set.AppendChild(tbh);
-            XmlElement datas = doc.CreateElement("Datas");
+            XmlElement datas = doc.CreateElement("Pages");
             cfg.AppendChild(datas);
-            for (int i = 0; i < tabControl.TabPages.Count; i++)
+            for (int i = 0; i < listViews.Count; i++)
             {
                 XmlElement tbnane = doc.CreateElement("Name");
                 tbnane.InnerText = buttons[i].Text;
@@ -356,7 +373,7 @@ namespace MyLinks
                 fcolor.InnerText = listViews[i].ForeColor.ToArgb().ToString();
                 XmlElement bcolor = doc.CreateElement("ListBackColor");
                 bcolor.InnerText = listViews[i].BackColor.ToArgb().ToString();
-                XmlElement tab = doc.CreateElement("Table");
+                XmlElement tab = doc.CreateElement("Page");
                 tab.AppendChild(tbnane);
                 tab.AppendChild(bk);
                 tab.AppendChild(fcolor);
@@ -406,8 +423,8 @@ namespace MyLinks
                 TopMost = bool.Parse(doc.SelectSingleNode("Config/Setting/TopMost").InnerText);
                 noexit = bool.Parse(doc.SelectSingleNode("Config/Setting/NotExit").InnerText);
                 noReadLnk = bool.Parse(doc.SelectSingleNode("Config/Setting/NoReadLnk").InnerText);
-                tbwidth = int.Parse(doc.SelectSingleNode("Config/Setting/TableWidth").InnerText);
-                tbheight = int.Parse(doc.SelectSingleNode("Config/Setting/TableHeight").InnerText);
+                tbwidth = int.Parse(doc.SelectSingleNode("Config/Setting/LabelWidth").InnerText);
+                tbheight = int.Parse(doc.SelectSingleNode("Config/Setting/LabelHeight").InnerText);
                 if (lx + Width <= 0)
                 {
                     lx = 0;
@@ -425,13 +442,16 @@ namespace MyLinks
                     ly = Screen.PrimaryScreen.Bounds.Height - Height;
                 }
                 Location = new Point(lx, ly);
-                panelButton.Dock = (DockStyle)int.Parse(doc.SelectSingleNode("Config/Setting/TableLocation").InnerText);
-                panelButton.BackColor = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/TableBackColor").InnerText));
-                using (XmlNodeList tabs = doc.SelectNodes("Config/Datas/Table"))
+                panelButton.Dock = (DockStyle)int.Parse(doc.SelectSingleNode("Config/Setting/LabelLocation").InnerText);
+                panelButton.BackColor = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor1").InnerText));
+                colorB2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor2").InnerText));
+                colorF1 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor1").InnerText));
+                colorF2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor2").InnerText));
+                using (XmlNodeList tabs = doc.SelectNodes("Config/Pages/Page"))
                 {
                     for (int i = 0; i < tabs.Count; i++)
                     {
-                        AddTab(tabs[i].SelectSingleNode("Name").InnerText);
+                        AddPage(tabs[i].SelectSingleNode("Name").InnerText);
                         backimages[i] = tabs[i].SelectSingleNode("BackImage").InnerText;
                         if (bool.Parse(tabs[i].SelectSingleNode("BackImage").Attributes["On"].Value) && System.IO.File.Exists(backimages[i]))
                         {
@@ -458,7 +478,7 @@ namespace MyLinks
                         }
                     }
                 }
-                tabControl.SelectedIndex = int.Parse(doc.SelectSingleNode("Config/Setting/TableIndex").InnerText);
+                tabControl.SelectedIndex = int.Parse(doc.SelectSingleNode("Config/Setting/PageIndex").InnerText);
             }
             catch (Exception)
             {
@@ -551,7 +571,7 @@ namespace MyLinks
         {
             foreach (string item in files)
             {
-                if (!noReadLnk && item.ToLower().EndsWith(".lnk"))
+                if (noReadLnk == (ModifierKeys == Keys.Control) && item.ToLower().EndsWith(".lnk"))
                 {
                     try
                     {
@@ -570,7 +590,7 @@ namespace MyLinks
             WriteCfg();
         }
 
-        private void AddTab(string pgname)
+        private void AddPage(string pgname)
         {
             backimages.Add("");
             ImageList large = new ImageList
@@ -610,6 +630,7 @@ namespace MyLinks
             listView.Columns.Add("路径", 300, HorizontalAlignment.Left);
             listView.Columns.Add("参数", 100, HorizontalAlignment.Left);
             listView.Columns.Add("管理员权限", 100, HorizontalAlignment.Left);
+            //listView.ArrangeIcons();
             listViews.Add(listView);
             TabPage tabPage = new TabPage
             {
@@ -623,7 +644,7 @@ namespace MyLinks
             tabControl.TabPages.Add(tabPage);
             Button button = new Button
             {
-                BackColor = Color.White,
+                //BackColor = Color.Transparent,// Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(0),
                 Padding = new Padding(0),
@@ -632,13 +653,14 @@ namespace MyLinks
                 Text = pgname,
                 UseVisualStyleBackColor = false
             };
-            button.FlatAppearance.BorderColor = Color.LightBlue;
+            //button.FlatAppearance.BorderColor = Color.LightBlue;
             button.Click += new EventHandler(Button_Click);
+            //button.MouseDown += new MouseEventHandler(Button_MouseDown);
             buttons.Add(button);
             panelButton.Controls.Add(button);
         }
 
-        private void RemoveTab(int i)
+        private void RemovePage(int i)
         {
             backimages.RemoveAt(i);
             listViews.RemoveAt(i);
@@ -654,26 +676,29 @@ namespace MyLinks
             panelButton.Width = tbwidth;
             panelButton.Height = tbheight;
             panelButton.Controls.Clear();
-            for (int j = 0; j < buttons.Count; j++)
+            for (int i = 0; i < buttons.Count; i++)
             {
-                buttons[j].Size = new Size(tbwidth, tbheight);
+                buttons[i].Size = new Size(tbwidth, tbheight);
                 if (panelButton.Dock == DockStyle.Top || panelButton.Dock == DockStyle.Bottom)
                 {
-                    buttons[j].Location = new Point(tbwidth * j, 0);
+                    buttons[i].Location = new Point(tbwidth * i, 0);
                 }
                 else
                 {
-                    buttons[j].Location = new Point(0, tbheight * j);
+                    buttons[i].Location = new Point(0, tbheight * i);
                 }
-                panelButton.Controls.Add(buttons[j]);
-                if (j == tabControl.SelectedIndex)
+                panelButton.Controls.Add(buttons[i]);
+                if (i == tabControl.SelectedIndex)
                 {
-                    buttons[j].BackColor = Color.LightBlue;
+                    buttons[i].ForeColor = colorF2;
+                    buttons[i].BackColor = colorB2;// Color.LightBlue;
                 }
                 else
                 {
-                    buttons[j].BackColor = Color.White;
+                    buttons[i].ForeColor = colorF1;
+                    buttons[i].BackColor = Color.Transparent;// Color.White;
                 }
+                buttons[i].FlatAppearance.BorderColor = colorB2;
             }
             FormMain_Resize(null, null);
         }
@@ -683,25 +708,25 @@ namespace MyLinks
         private void ContextMenuStripMain_Opening(object sender, CancelEventArgs e)
         {
             bool b = listViews.Count > 0 && listViews[tabControl.SelectedIndex].SelectedItems.Count > 0;
-            管理员方式运行ToolStripMenuItem.Visible = b;
+            RunAsAdminToolStripMenuItem.Visible = b;
             删除ToolStripMenuItem.Visible = b;
-            浏览文件ToolStripMenuItem.Visible = b;
-            修改ToolStripMenuItem.Visible = b;
+            ShowFileToolStripMenuItem.Visible = b;
+            EditToolStripMenuItem.Visible = b;
             toolStripMenuItem1.Visible = tabControl.TabPages.Count > 0;
-            刪除类别ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            RemovePageToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
             查看ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-            添加ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-            清空ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0 && listViews[tabControl.SelectedIndex].Items.Count > 0; ;
-            类别设置ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            AddToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            ClearToolStripMenuItem.Visible = tabControl.TabPages.Count > 0 && listViews[tabControl.SelectedIndex].Items.Count > 0; ;
+            EditPageToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
         }
 
-        private void 大图标ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.LargeIcon;
-        private void 小图标ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.SmallIcon;
-        private void 详细ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.Details;
-        private void 列表ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.List;
-        private void 平铺ToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.Tile;
+        private void BigIconsToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.LargeIcon;
+        private void SmallIconsToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.SmallIcon;
+        private void DetailToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.Details;
+        private void ListToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.List;
+        private void TileToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.Tile;
 
-        private void 文件ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -714,7 +739,7 @@ namespace MyLinks
             }
         }
 
-        private void 目录ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddDirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (FolderBrowserDialog folder = new FolderBrowserDialog())
             {
@@ -726,7 +751,7 @@ namespace MyLinks
             }
         }
 
-        private void 自定义ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddNewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (EditIco editIco = new EditIco(new IcoFileInfo("")))
             {
@@ -739,7 +764,7 @@ namespace MyLinks
             }
         }
 
-        private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RemoveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = tabControl.SelectedIndex;
             int j = listViews[i].SelectedItems[0].Index;
@@ -762,7 +787,7 @@ namespace MyLinks
             }
         }
 
-        private void 浏览文件ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ShowFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (listViews[tabControl.SelectedIndex].SelectedItems.Count > 0)
             {
@@ -781,7 +806,7 @@ namespace MyLinks
             }
         }
 
-        private void 清空ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ClearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (listViews[tabControl.SelectedIndex].Items.Count >= 1 && MessageBox.Show(this, "确定要删除所有项目？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
@@ -791,7 +816,7 @@ namespace MyLinks
             }
         }
 
-        private void 管理员方式运行ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RunAsAdminToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i1 = tabControl.SelectedIndex;
             int i = listViews[i1].SelectedItems[0].Index;
@@ -815,7 +840,7 @@ namespace MyLinks
             }
         }
 
-        private void 修改ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void EditToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i1 = tabControl.SelectedIndex;
             if (listViews[i1].SelectedItems.Count > 0)
@@ -847,44 +872,44 @@ namespace MyLinks
             }
         }
 
-        private void 类别设置ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void EditPageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (EditTab editTab = new EditTab(this, tabControl.SelectedIndex))
+            using (EditPage editTab = new EditPage(this, tabControl.SelectedIndex))
             {
                 editTab.ShowDialog();
             }
         }
 
-        private void 添加类别ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddPageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (NameTab nameTab = new NameTab(null))
+            using (InputName nameTab = new InputName(null))
             {
                 nameTab.TopMost = TopMost;
                 if (nameTab.ShowDialog() == DialogResult.OK)
                 {
-                    AddTab(nameTab.name);
+                    AddPage(nameTab.name);
                     tabControl.SelectedIndex = tabControl.TabPages.Count - 1;
                     FitButton();
                 }
             }
         }
 
-        private void 刪除类别ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void RemovePageToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int i = tabControl.SelectedIndex;
             if (i > -1 && MessageBox.Show(this, "确定要删除选择的项目吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
-                RemoveTab(i);
+                RemovePage(i);
             }
         }
 
-        private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SettingToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int w1 = tbwidth;
             int h1 = tbheight;
             using (Setting setting = new Setting(this))
             {
-                if (sender == 设置ToolStripMenuItem)
+                if (sender == SettingToolStripMenuItem)
                 {
                     setting.StartPosition = FormStartPosition.CenterParent;
                 }
@@ -899,7 +924,7 @@ namespace MyLinks
             notifyIcon.Text = Text;
         }
 
-        private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             goexit = true;
             Close();
