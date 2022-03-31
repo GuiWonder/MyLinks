@@ -1,6 +1,6 @@
 namespace MyLinks
 {
-    partial class EditTab
+    partial class EditPage
     {/// <summary>
      /// Required designer variable.
      /// </summary>
@@ -44,7 +44,7 @@ namespace MyLinks
             // checkBoxBG
             // 
             this.checkBoxBG.AutoSize = true;
-            this.checkBoxBG.Location = new System.Drawing.Point(12, 138);
+            this.checkBoxBG.Location = new System.Drawing.Point(11, 78);
             this.checkBoxBG.Name = "checkBoxBG";
             this.checkBoxBG.Size = new System.Drawing.Size(96, 16);
             this.checkBoxBG.TabIndex = 0;
@@ -55,7 +55,7 @@ namespace MyLinks
             // textBoxImg
             // 
             this.textBoxImg.AllowDrop = true;
-            this.textBoxImg.Location = new System.Drawing.Point(46, 160);
+            this.textBoxImg.Location = new System.Drawing.Point(45, 100);
             this.textBoxImg.Multiline = true;
             this.textBoxImg.Name = "textBoxImg";
             this.textBoxImg.Size = new System.Drawing.Size(333, 43);
@@ -67,7 +67,7 @@ namespace MyLinks
             // checkBoxTiled
             // 
             this.checkBoxTiled.AutoSize = true;
-            this.checkBoxTiled.Location = new System.Drawing.Point(37, 210);
+            this.checkBoxTiled.Location = new System.Drawing.Point(36, 150);
             this.checkBoxTiled.Name = "checkBoxTiled";
             this.checkBoxTiled.Size = new System.Drawing.Size(96, 16);
             this.checkBoxTiled.TabIndex = 2;
@@ -78,7 +78,7 @@ namespace MyLinks
             // linkLabelBKImage
             // 
             this.linkLabelBKImage.AutoSize = true;
-            this.linkLabelBKImage.Location = new System.Drawing.Point(385, 160);
+            this.linkLabelBKImage.Location = new System.Drawing.Point(349, 85);
             this.linkLabelBKImage.Name = "linkLabelBKImage";
             this.linkLabelBKImage.Size = new System.Drawing.Size(29, 12);
             this.linkLabelBKImage.TabIndex = 3;
@@ -106,7 +106,7 @@ namespace MyLinks
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 100);
+            this.label3.Location = new System.Drawing.Point(138, 48);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(53, 12);
             this.label3.TabIndex = 21;
@@ -115,7 +115,7 @@ namespace MyLinks
             // pictureBoxFore
             // 
             this.pictureBoxFore.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxFore.Location = new System.Drawing.Point(71, 94);
+            this.pictureBoxFore.Location = new System.Drawing.Point(199, 42);
             this.pictureBoxFore.Name = "pictureBoxFore";
             this.pictureBoxFore.Size = new System.Drawing.Size(25, 25);
             this.pictureBoxFore.TabIndex = 24;
@@ -125,7 +125,7 @@ namespace MyLinks
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 57);
+            this.label4.Location = new System.Drawing.Point(10, 48);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(53, 12);
             this.label4.TabIndex = 21;
@@ -134,7 +134,7 @@ namespace MyLinks
             // pictureBoxBack
             // 
             this.pictureBoxBack.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxBack.Location = new System.Drawing.Point(71, 51);
+            this.pictureBoxBack.Location = new System.Drawing.Point(71, 42);
             this.pictureBoxBack.Name = "pictureBoxBack";
             this.pictureBoxBack.Size = new System.Drawing.Size(25, 25);
             this.pictureBoxBack.TabIndex = 24;
@@ -145,7 +145,7 @@ namespace MyLinks
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(427, 271);
+            this.ClientSize = new System.Drawing.Size(391, 184);
             this.Controls.Add(this.pictureBoxBack);
             this.Controls.Add(this.pictureBoxFore);
             this.Controls.Add(this.label4);
