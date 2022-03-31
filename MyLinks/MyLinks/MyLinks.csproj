@@ -76,11 +76,11 @@
     <Compile Include="EditIco.Designer.cs">
       <DependentUpon>EditIco.cs</DependentUpon>
     </Compile>
-    <Compile Include="EditTab.cs">
+    <Compile Include="EditPage.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="EditTab.Designer.cs">
-      <DependentUpon>EditTab.cs</DependentUpon>
+    <Compile Include="EditPage.Designer.cs">
+      <DependentUpon>EditPage.cs</DependentUpon>
     </Compile>
     <Compile Include="FilesystemIcons.cs" />
     <Compile Include="FormMain.cs">
@@ -89,11 +89,11 @@
     <Compile Include="FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="NameTab.cs">
+    <Compile Include="InputName.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NameTab.Designer.cs">
-      <DependentUpon>NameTab.cs</DependentUpon>
+    <Compile Include="InputName.Designer.cs">
+      <DependentUpon>InputName.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Setting.cs">
@@ -105,14 +105,14 @@
     <EmbeddedResource Include="EditIco.resx">
       <DependentUpon>EditIco.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="EditTab.resx">
-      <DependentUpon>EditTab.cs</DependentUpon>
+    <EmbeddedResource Include="EditPage.resx">
+      <DependentUpon>EditPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMain.resx">
       <DependentUpon>FormMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="NameTab.resx">
-      <DependentUpon>NameTab.cs</DependentUpon>
+    <EmbeddedResource Include="InputName.resx">
+      <DependentUpon>InputName.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Setting.resx">
       <DependentUpon>Setting.cs</DependentUpon>
