@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace MyLinks
@@ -21,7 +22,11 @@ namespace MyLinks
             textBoxTitle.Text = f1.Text;
             checkBoxStateBar.Checked = f1.ShowInTaskbar;
             checkBoxFormIcon.Checked = f1.ShowIcon;
-            pictureBoxBack.BackColor = f1.panelButton.BackColor;
+            pictureBoxB1.BackColor = f1.panelButton.BackColor;
+            //pictureBoxB1.BackColor = Color.White;
+            pictureBoxB2.BackColor = f1.colorB2;
+            pictureBoxF1.BackColor = f1.colorF1;
+            pictureBoxF2.BackColor = f1.colorF2;
             textBoxBW.Text = f1.tbwidth.ToString();
             textBoxBH.Text = f1.tbheight.ToString();
             checkBoxAutoStart.Click += CheckBoxAutoStart_Click;
@@ -96,15 +101,36 @@ namespace MyLinks
             f1.FitButton();
         }
 
-        private void PictureBoxBack_Click(object sender, EventArgs e)
+        private void PictureBox_Click(object sender, EventArgs e)
         {
             using (ColorDialog colorDialog = new ColorDialog())
             {
                 if (colorDialog.ShowDialog() == DialogResult.OK)
                 {
-                    pictureBoxBack.BackColor = colorDialog.Color;
-                    f1.panelButton.BackColor = colorDialog.Color;
+                    ((PictureBox)sender).BackColor = colorDialog.Color;
                 }
+            }
+            FitColor();
+        }
+
+        private void FitColor()
+        {
+            f1.panelButton.BackColor = pictureBoxB1.BackColor;
+            f1.colorB2 = pictureBoxB2.BackColor;
+            f1.colorF1 = pictureBoxF1.BackColor;
+            f1.colorF2 = pictureBoxF2.BackColor;
+            f1.FitButton();
+        }
+
+        private void Button1_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("确定要载入预设值？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+            {
+                pictureBoxB1.BackColor = Color.White;
+                pictureBoxB2.BackColor = Color.LightBlue;
+                pictureBoxF1.BackColor = Color.Black;
+                pictureBoxF2.BackColor = Color.Black;
+                FitColor();
             }
         }
     }
