@@ -3,10 +3,10 @@ using System.Windows.Forms;
 
 namespace MyLinks
 {
-    public partial class NameTab : Form
+    public partial class InputName : Form
     {
         public string name;
-        public NameTab(string n)
+        public InputName(string n)
         {
             InitializeComponent();
             buttonOK.Click += ButtonOK_Click;
