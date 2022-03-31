@@ -4,11 +4,11 @@ using System.Windows.Forms;
 
 namespace MyLinks
 {
-    public partial class EditTab : Form
+    public partial class EditPage : Form
     {
         readonly FormMain f1;
         readonly int i;
-        public EditTab(FormMain form1, int i1)
+        public EditPage(FormMain form1, int i1)
         {
             InitializeComponent();
             f1 = form1;
