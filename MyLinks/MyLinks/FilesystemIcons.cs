@@ -111,9 +111,11 @@ namespace MyLinks
         {
             //IntPtr hImgSmall = default(IntPtr);
             //The handle to the system image list.
-            SHFILEINFO shinfo = new SHFILEINFO();
-            shinfo.szDisplayName = new string((char)0, 260);
-            shinfo.szTypeName = new string((char)0, 80);
+            SHFILEINFO shinfo = new SHFILEINFO
+            {
+                szDisplayName = new string((char)0, 260),
+                szTypeName = new string((char)0, 80)
+            };
             SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_SMALLICON);
             return Icon.FromHandle(shinfo.hIcon);
         }
@@ -127,9 +129,11 @@ namespace MyLinks
         {
             //IntPtr hImgSmall = default(IntPtr);
             //The handle to the system image list.
-            SHFILEINFO shinfo = new SHFILEINFO();
-            shinfo.szDisplayName = new string((char)0, 260);
-            shinfo.szTypeName = new string((char)0, 80);
+            SHFILEINFO shinfo = new SHFILEINFO
+            {
+                szDisplayName = new string((char)0, 260),
+                szTypeName = new string((char)0, 80)
+            };
             SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_LARGEICON);
             return Icon.FromHandle(shinfo.hIcon);
         }
