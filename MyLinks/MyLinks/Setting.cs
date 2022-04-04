@@ -13,25 +13,40 @@ namespace MyLinks
             InitializeComponent();
             f1 = form1;
             TopMost = f1.TopMost;
+            textBoxTitle.Text = f1.Text;
             checkBoxHideStart.Checked = f1.hideStart;
             checkBoxHideRun.Checked = f1.hideRun;
             checkBoxTopmost.Checked = f1.TopMost;
             checkBoxNotExit.Checked = f1.noexit;
             checkBoxNoReadLnk.Checked = f1.noReadLnk;
-            comboBoxTabLoac.SelectedIndex = (int)(f1.panelButton.Dock - 1);
-            textBoxTitle.Text = f1.Text;
+            checkBoxDClick.Checked = f1.dClick;
             checkBoxStateBar.Checked = f1.ShowInTaskbar;
             checkBoxFormIcon.Checked = f1.ShowIcon;
+            checkBoxAutoStart.Checked = IsAutoStart(null);
+            numericUpDownC.Value = f1.columnSpacing;
+            numericUpDownL.Value = f1.lineSpacing;
+            numericUpDownLabW.Value = f1.tbwidth;
+            numericUpDownLabH.Value = f1.tbheight;
+            comboBoxTabLoac.SelectedIndex = (int)(f1.panelButton.Dock - 1);
             pictureBoxB1.BackColor = f1.panelButton.BackColor;
             //pictureBoxB1.BackColor = Color.White;
             pictureBoxB2.BackColor = f1.colorB2;
             pictureBoxF1.BackColor = f1.colorF1;
             pictureBoxF2.BackColor = f1.colorF2;
-            textBoxBW.Text = f1.tbwidth.ToString();
-            textBoxBH.Text = f1.tbheight.ToString();
             checkBoxAutoStart.Click += CheckBoxAutoStart_Click;
+            checkBoxHideStart.CheckedChanged += CheckBoxHideStart_CheckedChanged;
+            checkBoxTopmost.CheckedChanged += CheckBoxTopmost_CheckedChanged;
+            checkBoxDClick.CheckedChanged += CheckBoxDClick_CheckedChanged;
+            checkBoxHideRun.CheckedChanged += CheckBoxHideRun_CheckedChanged;
+            checkBoxNotExit.CheckedChanged += CheckBoxNotExit_CheckedChanged;
+            checkBoxNoReadLnk.CheckedChanged += CheckBoxNoReadLnk_CheckedChanged;
+            checkBoxFormIcon.CheckedChanged += CheckBoxFormIcon_CheckedChanged;
+            comboBoxTabLoac.SelectedIndexChanged += ComboBoxTabLoac_SelectedIndexChanged;
+            numericUpDownLabW.ValueChanged += NumericUpDownLab_ValueChanged;
+            numericUpDownLabH.ValueChanged += NumericUpDownLab_ValueChanged;
+            numericUpDownL.ValueChanged += NumericUpDown_ValueChanged;
+            numericUpDownC.ValueChanged += NumericUpDown_ValueChanged;
             FormClosing += Setting_FormClosing;
-            checkBoxAutoStart.Checked = IsAutoStart(null);
         }
 
         private bool IsAutoStart(bool? isOn)
@@ -60,16 +75,6 @@ namespace MyLinks
 
         private void Setting_FormClosing(object sender, FormClosingEventArgs e)
         {
-            try
-            {
-                f1.tbwidth = int.Parse(textBoxBW.Text);
-                f1.tbheight = int.Parse(textBoxBH.Text);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-                e.Cancel = true;
-            }
             f1.ShowInTaskbar = checkBoxStateBar.Checked;
         }
         private void CheckBoxHideStart_CheckedChanged(object sender, EventArgs e) => f1.hideStart = checkBoxHideStart.Checked;
@@ -78,6 +83,9 @@ namespace MyLinks
         private void CheckBoxNotExit_CheckedChanged(object sender, EventArgs e) => f1.noexit = checkBoxNotExit.Checked;
         private void TextBoxTitle_TextChanged(object sender, EventArgs e) => f1.Text = textBoxTitle.Text;
         private void CheckBoxNoReadLnk_CheckedChanged(object sender, EventArgs e) => f1.noReadLnk = checkBoxNoReadLnk.Checked;
+        private void CheckBoxDClick_CheckedChanged(object sender, EventArgs e) => f1.dClick = checkBoxDClick.Checked;
+        private void CheckBoxFormIcon_CheckedChanged(object sender, EventArgs e) => f1.ShowIcon = checkBoxFormIcon.Checked;
+
         private void CheckBoxAutoStart_Click(object sender, EventArgs e)
         {
             try
@@ -88,11 +96,6 @@ namespace MyLinks
             {
                 MessageBox.Show(ex.ToString());
             }
-        }
-
-        private void CheckBoxFormIcon_CheckedChanged(object sender, EventArgs e)
-        {
-            f1.ShowIcon = checkBoxFormIcon.Checked;
         }
 
         private void ComboBoxTabLoac_SelectedIndexChanged(object sender, EventArgs e)
@@ -132,6 +135,20 @@ namespace MyLinks
                 pictureBoxF2.BackColor = Color.Black;
                 FitColor();
             }
+        }
+
+        private void NumericUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            f1.columnSpacing = (int)numericUpDownC.Value;
+            f1.lineSpacing = (int)numericUpDownL.Value;
+            f1.SetIcoSpacing();
+        }
+
+        private void NumericUpDownLab_ValueChanged(object sender, EventArgs e)
+        {
+            f1.tbwidth = (int)numericUpDownLabW.Value;
+            f1.tbheight = (int)numericUpDownLabH.Value;
+            f1.FitButton();
         }
     }
 }
