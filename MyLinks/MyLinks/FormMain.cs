@@ -20,8 +20,11 @@ namespace MyLinks
         public bool hideStart;
         public bool hideRun;
         public bool noReadLnk;
+        public bool dClick;
         public int tbwidth;
         public int tbheight;
+        public int lineSpacing;
+        public int columnSpacing;
         public readonly string apppath;
         public readonly string appname;
         public readonly string appdir;
@@ -45,10 +48,12 @@ namespace MyLinks
             cfgFile = appdir + "\\" + appname + ".xml";
             tbwidth = 55;
             tbheight = 23;
+            lineSpacing = 75;
+            columnSpacing = 75;
             InitializeComponent();
             Load += FormMain_Load;
             FormClosing += FormMain_FormClosing;
-            MouseDown += FormMain_MouseDown;
+            panel1.MouseDown += FormMain_MouseDown;
             panelButton.MouseDown += FormMain_MouseDown;
             Resize += FormMain_Resize;
             LocationChanged += FormMain_LocationChanged;
@@ -62,7 +67,7 @@ namespace MyLinks
                 Margin = new Padding(0),
                 Padding = new Point(0, 0)
             };
-            Controls.Add(tabControl);
+            panel1.Controls.Add(tabControl);
             ReadCfg();
             notifyIcon.Text = Text;
             //if (tabControl.SelectedIndex > -1)
@@ -97,35 +102,48 @@ namespace MyLinks
                 WindowState = FormWindowState.Minimized;
                 BeginInvoke(new System.Threading.ThreadStart(Hide));
             }
+            if (lineSpacing != 75 || columnSpacing != 75)
+                SetIcoSpacing();
+        }
+
+        public void SetIcoSpacing()
+        {
+            foreach (ListView listView in listViews)
+            {
+                SendMessage(listView.Handle, 0x1035, 0, 0x10000 * columnSpacing + lineSpacing);
+            }
         }
 
         private void FormMain_Resize(object sender, EventArgs e)
         {
-            switch (panelButton.Dock)
-            {
-                case DockStyle.Top:
-                    tabControl.Width = ClientSize.Width + 8;
-                    tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
-                    tabControl.Location = new Point(-4, tbheight - 4);
-                    break;
-                case DockStyle.Bottom:
-                    tabControl.Width = ClientSize.Width + 8;
-                    tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
-                    tabControl.Location = new Point(-4, -4);
-                    break;
-                case DockStyle.Left:
-                    tabControl.Width = ClientSize.Width + 8 - tbwidth;
-                    tabControl.Height = ClientSize.Height + 8 + 16;
-                    tabControl.Location = new Point(-4 + tbwidth, -4);
-                    break;
-                case DockStyle.Right:
-                    tabControl.Width = ClientSize.Width + 8 - tbwidth;
-                    tabControl.Height = ClientSize.Height + 8 + 16;
-                    tabControl.Location = new Point(-4, -4);
-                    break;
-                default:
-                    break;
-            }
+            tabControl.Width = panel1.Width + 8;
+            tabControl.Height = panel1.Height + 8 + 16;
+            tabControl.Location = new Point(-4, -4);
+            //switch (panelButton.Dock)
+            //{
+            //    case DockStyle.Top:
+            //        tabControl.Width = ClientSize.Width + 8;
+            //        tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
+            //        tabControl.Location = new Point(-4, tbheight - 4);
+            //        break;
+            //    case DockStyle.Bottom:
+            //        tabControl.Width = ClientSize.Width + 8;
+            //        tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
+            //        tabControl.Location = new Point(-4, -4);
+            //        break;
+            //    case DockStyle.Left:
+            //        tabControl.Width = ClientSize.Width + 8 - tbwidth;
+            //        tabControl.Height = ClientSize.Height + 8 + 16;
+            //        tabControl.Location = new Point(-4 + tbwidth, -4);
+            //        break;
+            //    case DockStyle.Right:
+            //        tabControl.Width = ClientSize.Width + 8 - tbwidth;
+            //        tabControl.Height = ClientSize.Height + 8 + 16;
+            //        tabControl.Location = new Point(-4, -4);
+            //        break;
+            //    default:
+            //        break;
+            //}
             if (WindowState == FormWindowState.Normal)
             {
                 width = Width;
@@ -167,25 +185,37 @@ namespace MyLinks
 
         private void ListViews_MouseClick(object sender, MouseEventArgs e)
         {
-            int i1 = tabControl.SelectedIndex;
-            if (e.Button == MouseButtons.Left && listViews[i1].SelectedItems.Count == 1)
+            if (!dClick && e.Button == MouseButtons.Left && listViews[tabControl.SelectedIndex].SelectedItems.Count == 1)
             {
-                string path = listViews[i1].SelectedItems[0].SubItems[1].Text;
-                string arg = listViews[i1].SelectedItems[0].SubItems[2].Text;
-                bool runas = listViews[i1].SelectedItems[0].SubItems[3].Text.ToLower() == "true";
-                try
-                {
-                    RunIcon(path, arg, runas);
-                }
-                catch (Exception exception)
-                {
-                    MessageBox.Show(exception.Message);
-                    return;
-                }
-                if (hideRun == !(ModifierKeys == Keys.Control))
-                {
-                    Hide();
-                }
+                RunItem();
+            }
+        }
+
+        private void RunItem()
+        {
+            string path = listViews[tabControl.SelectedIndex].SelectedItems[0].SubItems[1].Text;
+            string arg = listViews[tabControl.SelectedIndex].SelectedItems[0].SubItems[2].Text;
+            bool runas = listViews[tabControl.SelectedIndex].SelectedItems[0].SubItems[3].Text.ToLower() == "true";
+            try
+            {
+                RunIcon(path, arg, runas);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+                return;
+            }
+            if (hideRun == !(ModifierKeys == Keys.Control))
+            {
+                Hide();
+            }
+        }
+
+        private void ListView_DoubleClick(object sender, EventArgs e)
+        {
+            if (dClick)
+            {
+                RunItem();
             }
         }
 
@@ -272,7 +302,6 @@ namespace MyLinks
                     item.FlatAppearance.BorderColor = colorB2;
                 }
             }
-
         }
 
         private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
@@ -335,6 +364,15 @@ namespace MyLinks
             XmlElement nordlnk = doc.CreateElement("NoReadLnk");
             nordlnk.InnerText = noReadLnk.ToString();
             set.AppendChild(nordlnk);
+            XmlElement dcl = doc.CreateElement("DoubleClickRun");
+            dcl.InnerText = dClick.ToString();
+            set.AppendChild(dcl);
+            XmlElement lspa = doc.CreateElement("LineSpacing");
+            lspa.InnerText = lineSpacing.ToString();
+            set.AppendChild(lspa);
+            XmlElement cspa = doc.CreateElement("ColumnSpacing");
+            cspa.InnerText = columnSpacing.ToString();
+            set.AppendChild(cspa);
             XmlElement tbloc = doc.CreateElement("LabelLocation");
             tbloc.InnerText = ((int)panelButton.Dock).ToString();
             set.AppendChild(tbloc);
@@ -423,6 +461,9 @@ namespace MyLinks
                 TopMost = bool.Parse(doc.SelectSingleNode("Config/Setting/TopMost").InnerText);
                 noexit = bool.Parse(doc.SelectSingleNode("Config/Setting/NotExit").InnerText);
                 noReadLnk = bool.Parse(doc.SelectSingleNode("Config/Setting/NoReadLnk").InnerText);
+                dClick = bool.Parse(doc.SelectSingleNode("Config/Setting/DoubleClickRun").InnerText);
+                lineSpacing = int.Parse(doc.SelectSingleNode("Config/Setting/LineSpacing").InnerText);
+                columnSpacing = int.Parse(doc.SelectSingleNode("Config/Setting/ColumnSpacing").InnerText);
                 tbwidth = int.Parse(doc.SelectSingleNode("Config/Setting/LabelWidth").InnerText);
                 tbheight = int.Parse(doc.SelectSingleNode("Config/Setting/LabelHeight").InnerText);
                 if (lx + Width <= 0)
@@ -562,9 +603,8 @@ namespace MyLinks
 
         private void AddFile(string file)
         {
-            int i = tabControl.SelectedIndex;
             IcoFileInfo fileinf = new IcoFileInfo(file);
-            AddFile(fileinf, i);
+            AddFile(fileinf, tabControl.SelectedIndex);
         }
 
         private void AddFiles(string[] files)
@@ -624,6 +664,7 @@ namespace MyLinks
             listView.DragOver += ListView_DragOver;
             listView.ItemDrag += ListView_ItemDrag;
             listView.MouseClick += ListViews_MouseClick;
+            listView.DoubleClick += ListView_DoubleClick;
             listView.MouseDown += ListView_MouseDown;
             listView.Columns.Add("名称", 100, HorizontalAlignment.Left);
             //listView.Columns.Add("类型", 60, HorizontalAlignment.Left);
@@ -709,12 +750,12 @@ namespace MyLinks
         {
             bool b = listViews.Count > 0 && listViews[tabControl.SelectedIndex].SelectedItems.Count > 0;
             RunAsAdminToolStripMenuItem.Visible = b;
-            删除ToolStripMenuItem.Visible = b;
+            RemoveToolStripMenuItem.Visible = b;
             ShowFileToolStripMenuItem.Visible = b;
             EditToolStripMenuItem.Visible = b;
             toolStripMenuItem1.Visible = tabControl.TabPages.Count > 0;
             RemovePageToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-            查看ToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            ViewToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
             AddToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
             ClearToolStripMenuItem.Visible = tabControl.TabPages.Count > 0 && listViews[tabControl.SelectedIndex].Items.Count > 0; ;
             EditPageToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
@@ -791,13 +832,13 @@ namespace MyLinks
         {
             if (listViews[tabControl.SelectedIndex].SelectedItems.Count > 0)
             {
-                string ffull = listViews[tabControl.SelectedIndex].SelectedItems[0].SubItems[1].Text;
-                if (ffull.Contains(" "))
-                {
-                    ffull = "\"" + ffull + "\"";
-                }
                 using (System.Diagnostics.Process p = new System.Diagnostics.Process())
                 {
+                    string ffull = listViews[tabControl.SelectedIndex].SelectedItems[0].SubItems[1].Text;
+                    if (ffull.Contains(" "))
+                    {
+                        ffull = "\"" + ffull + "\"";
+                    }
                     p.StartInfo.FileName = "Explorer.exe";
                     p.StartInfo.Arguments = "/e,/select," + ffull;
                     p.Start();
@@ -874,9 +915,9 @@ namespace MyLinks
 
         private void EditPageToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (EditPage editTab = new EditPage(this, tabControl.SelectedIndex))
+            using (EditPage editPage = new EditPage(this, tabControl.SelectedIndex))
             {
-                editTab.ShowDialog();
+                editPage.ShowDialog();
             }
         }
 
