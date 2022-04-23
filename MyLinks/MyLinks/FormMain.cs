@@ -119,31 +119,6 @@ namespace MyLinks
             tabControl.Width = panel1.Width + 8;
             tabControl.Height = panel1.Height + 8 + 16;
             tabControl.Location = new Point(-4, -4);
-            //switch (panelButton.Dock)
-            //{
-            //    case DockStyle.Top:
-            //        tabControl.Width = ClientSize.Width + 8;
-            //        tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
-            //        tabControl.Location = new Point(-4, tbheight - 4);
-            //        break;
-            //    case DockStyle.Bottom:
-            //        tabControl.Width = ClientSize.Width + 8;
-            //        tabControl.Height = ClientSize.Height + 8 + 16 - tbheight;
-            //        tabControl.Location = new Point(-4, -4);
-            //        break;
-            //    case DockStyle.Left:
-            //        tabControl.Width = ClientSize.Width + 8 - tbwidth;
-            //        tabControl.Height = ClientSize.Height + 8 + 16;
-            //        tabControl.Location = new Point(-4 + tbwidth, -4);
-            //        break;
-            //    case DockStyle.Right:
-            //        tabControl.Width = ClientSize.Width + 8 - tbwidth;
-            //        tabControl.Height = ClientSize.Height + 8 + 16;
-            //        tabControl.Location = new Point(-4, -4);
-            //        break;
-            //    default:
-            //        break;
-            //}
             if (WindowState == FormWindowState.Normal)
             {
                 width = Width;
@@ -245,7 +220,6 @@ namespace MyLinks
 
         private void ListViews_DragDrop(object sender, DragEventArgs e)
         {
-            ((ListView)sender).BeginUpdate();
             string[] s = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (s != null && s.Length > 0)
             {
@@ -255,9 +229,10 @@ namespace MyLinks
             {
                 Point p = ((ListView)sender).PointToClient(MousePosition);
                 ListViewItem toitem = ((ListView)sender).GetItemAt(p.X, p.Y);
-                if (dragMove != null && toitem != null)
+                ListViewItem fritem = ((ListView)sender).SelectedItems[0];
+                if (dragMove != null && toitem != null && fritem != toitem)
                 {
-                    ListViewItem fritem = ((ListView)sender).SelectedItems[0];
+                    ((ListView)sender).BeginUpdate();
                     if (fritem.Index > toitem.Index)
                     {
                         ((ListView)sender).Items.RemoveAt(fritem.Index);
@@ -274,9 +249,9 @@ namespace MyLinks
                         ((ListView)sender).View = View.Details;
                         ((ListView)sender).View = view;
                     }
+                ((ListView)sender).EndUpdate();
                 }
             }
-            ((ListView)sender).EndUpdate();
         }
 
         private void Button_Click(object sender, EventArgs e)
@@ -598,6 +573,12 @@ namespace MyLinks
             item.SubItems.Add(icoInfoFile.FullName);
             item.SubItems.Add(icoInfoFile.Args);
             item.SubItems.Add(icoInfoFile.RunAsA.ToString());
+            string tip = $"{item.Text}\n链接：{item.SubItems[1].Text}";
+            if (!string.IsNullOrEmpty(item.SubItems[2].Text))
+            {
+                tip += $"\n参数：{item.SubItems[2].Text}";
+            }
+            item.ToolTipText = tip;
             listViews[i].Items.Add(item);
         }
 
@@ -657,8 +638,8 @@ namespace MyLinks
                 Margin = new Padding(0),
                 Padding = new Padding(0),
                 MultiSelect = false,
-                //listView.UseCompatibleStateImageBehavior = false;
                 ShowItemToolTips = true
+                //UseCompatibleStateImageBehavior = false
             };
             listView.DragDrop += ListViews_DragDrop;
             listView.DragOver += ListView_DragOver;
@@ -904,9 +885,15 @@ namespace MyLinks
                             smallImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.SmallIcon(editIco.f.FullName).ToBitmap();
                         }
                         listViews[i1].Items[i].Text = editIco.f.Name;
-                        listViews[i1].Items[i].SubItems[1].Text = editIco.f.FullName;
+                        listViews[i1].Items[i].SubItems[1].Text = editIco.f.Name;
                         listViews[i1].Items[i].SubItems[2].Text = editIco.f.Args;
                         listViews[i1].Items[i].SubItems[3].Text = editIco.f.RunAsA.ToString();
+                        string tip = $"{editIco.f.Name}\n链接：{editIco.f.Name}";
+                        if (!string.IsNullOrEmpty(editIco.f.Args))
+                        {
+                            tip += $"\n参数：{editIco.f.Args}";
+                        }
+                        listViews[i1].Items[i].ToolTipText = tip;
                         WriteCfg();
                     }
                 }
