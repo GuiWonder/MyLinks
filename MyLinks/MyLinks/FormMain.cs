@@ -885,7 +885,7 @@ namespace MyLinks
                             smallImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.SmallIcon(editIco.f.FullName).ToBitmap();
                         }
                         listViews[i1].Items[i].Text = editIco.f.Name;
-                        listViews[i1].Items[i].SubItems[1].Text = editIco.f.Name;
+                        listViews[i1].Items[i].SubItems[1].Text = editIco.f.FullName;
                         listViews[i1].Items[i].SubItems[2].Text = editIco.f.Args;
                         listViews[i1].Items[i].SubItems[3].Text = editIco.f.RunAsA.ToString();
                         string tip = $"{editIco.f.Name}\n链接：{editIco.f.Name}";
