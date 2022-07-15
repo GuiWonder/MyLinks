@@ -905,6 +905,7 @@ namespace MyLinks
             using (EditPage editPage = new EditPage(this, tabControl.SelectedIndex))
             {
                 editPage.ShowDialog();
+                WriteCfg();
             }
         }
 
@@ -918,6 +919,7 @@ namespace MyLinks
                     AddPage(nameTab.name);
                     tabControl.SelectedIndex = tabControl.TabPages.Count - 1;
                     FitButton();
+                    WriteCfg();
                 }
             }
         }
