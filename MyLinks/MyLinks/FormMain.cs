@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -39,6 +39,10 @@ namespace MyLinks
         public Color colorF2 = Color.Black;
 
         private ListViewItem dragMove;
+
+        public bool hotkeyon;
+        public string hotkey1;
+        public string hotkey2;
 
         public FormMain()
         {
@@ -372,6 +376,17 @@ namespace MyLinks
             XmlElement tbh = doc.CreateElement("LabelHeight");
             tbh.InnerText = tbheight.ToString();
             set.AppendChild(tbh);
+
+            XmlElement hotkon = doc.CreateElement("HotKeyOn");
+            hotkon.InnerText = hotkeyon.ToString();
+            set.AppendChild(hotkon);
+            XmlElement hotk1 = doc.CreateElement("HotKey1");
+            hotk1.InnerText = hotkey1;
+            set.AppendChild(hotk1);
+            XmlElement hotk2 = doc.CreateElement("HotKey2");
+            hotk2.InnerText = hotkey2;
+            set.AppendChild(hotk2);
+
             XmlElement datas = doc.CreateElement("Pages");
             cfg.AppendChild(datas);
             for (int i = 0; i < listViews.Count; i++)
@@ -463,6 +478,16 @@ namespace MyLinks
                 colorB2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor2").InnerText));
                 colorF1 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor1").InnerText));
                 colorF2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor2").InnerText));
+                try
+                {
+                    hotkeyon = bool.Parse(doc.SelectSingleNode("Config/Setting/HotKeyOn").InnerText);
+                    hotkey1 = doc.SelectSingleNode("Config/Setting/HotKey1").InnerText;
+                    hotkey2 = doc.SelectSingleNode("Config/Setting/HotKey2").InnerText;
+                }
+                catch (Exception)
+                {
+                    DefaultHotKey();
+                }
                 using (XmlNodeList tabs = doc.SelectNodes("Config/Pages/Page"))
                 {
                     for (int i = 0; i < tabs.Count; i++)
@@ -500,13 +525,89 @@ namespace MyLinks
             {
                 LoadDefault();
             }
+            if (hotkeyon)
+            {
+                OnHotKey();
+            }
         }
 
+        private void OnHotKey()
+        {
+            int cobk;
+            switch (hotkey1)
+            {
+                case "Ctr":
+                    cobk = 2;
+                    break;
+                case "Shift":
+                    cobk = 4;
+                    break;
+                case "Alt":
+                    cobk = 1;
+                    break;
+                case "Ctr+Shift":
+                    cobk = 6;
+                    break;
+                case "Ctr+Alt":
+                    cobk = 3;
+                    break;
+                case "Alt+Shift":
+                    cobk = 5;
+                    break;
+                case "Ctr+Shift+Alt":
+                    cobk = 7;
+                    break;
+                default:
+                    cobk = 0;
+                    break;
+            }
+
+            Keys hotKey = Event.GetKeys(hotkey2);
+            if (!Event.RegisterHotKey(this.Handle, 1, (uint)cobk, hotKey))
+            {
+                MessageBox.Show("热键配置失败！可能该热键被其他应用所占用，已为您关闭热键功能。");
+                hotkeyon = false;
+                return;
+            }
+        }
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_HOTKEY = 0x0312;
+
+            if (m.Msg == WM_HOTKEY)
+            {
+                if (m.WParam.ToString().Equals("1"))
+                {
+                    if (ActiveControl.Focused)
+                    {
+                        Hide();
+                    }
+                    else
+                    {
+                        Show();
+                        if (WindowState == FormWindowState.Minimized)
+                        {
+                            WindowState = FormWindowState.Normal;
+                        }
+                        Activate();
+                    }
+                }
+            }
+            base.WndProc(ref m);
+        }
+
+        private void DefaultHotKey()
+        {
+            hotkeyon = false;
+            hotkey1 = "Ctr";
+            hotkey2 = "F2 键";
+        }
         private void LoadDefault()
         {
             StartPosition = FormStartPosition.CenterScreen;
             Text = appname;
             notifyIcon.Text = appname;
+            DefaultHotKey();
         }
         #endregion
 
@@ -952,6 +1053,11 @@ namespace MyLinks
             Activate();
             WriteCfg();
             notifyIcon.Text = Text;
+            Event.UnregisterHotKey(Handle, 1);
+            if (hotkeyon)
+            {
+                OnHotKey();
+            }
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)

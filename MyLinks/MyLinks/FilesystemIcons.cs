@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -101,7 +101,6 @@ namespace MyLinks
             SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_SMALLICON);
             return Icon.FromHandle(shinfo.hIcon);
         }
-
         public static Icon GetLargeIcon(string pfad)
         {
             SHFILEINFO shinfo = new SHFILEINFO
@@ -112,7 +111,6 @@ namespace MyLinks
             SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_LARGEICON);
             return Icon.FromHandle(shinfo.hIcon);
         }
-
         #endregion
     }
 }

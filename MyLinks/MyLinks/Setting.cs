@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -47,6 +47,18 @@ namespace MyLinks
             numericUpDownL.ValueChanged += NumericUpDown_ValueChanged;
             numericUpDownC.ValueChanged += NumericUpDown_ValueChanged;
             FormClosing += Setting_FormClosing;
+            checkBoxHotKey.Checked = f1.hotkeyon;
+            comboBoxKey1.Text = f1.hotkey1;
+            comboBoxKey2.Text = f1.hotkey2;
+            comboBoxKey1.Enabled = checkBoxHotKey.Checked;
+            comboBoxKey2.Enabled = checkBoxHotKey.Checked;
+            checkBoxHotKey.CheckedChanged += CheckBoxHotKey_CheckedChanged;
+        }
+
+        private void CheckBoxHotKey_CheckedChanged(object sender, EventArgs e)
+        {
+            comboBoxKey1.Enabled = checkBoxHotKey.Checked;
+            comboBoxKey2.Enabled = checkBoxHotKey.Checked;
         }
 
         private bool IsAutoStart(bool? isOn)
@@ -76,6 +88,9 @@ namespace MyLinks
         private void Setting_FormClosing(object sender, FormClosingEventArgs e)
         {
             f1.ShowInTaskbar = checkBoxStateBar.Checked;
+            f1.hotkeyon = checkBoxHotKey.Checked;
+            f1.hotkey1 = comboBoxKey1.Text;
+            f1.hotkey2 = comboBoxKey2.Text;
         }
         private void CheckBoxHideStart_CheckedChanged(object sender, EventArgs e) => f1.hideStart = checkBoxHideStart.Checked;
         private void CheckBoxHideRun_CheckedChanged(object sender, EventArgs e) => f1.hideRun = checkBoxHideRun.Checked;
