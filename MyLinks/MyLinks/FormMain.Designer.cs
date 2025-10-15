@@ -81,13 +81,13 @@
             this.SettingToolStripMenuItem,
             this.ExitToolStripMenuItem});
             this.contextMenuStripMain.Name = "contextMenuStrip1";
-            this.contextMenuStripMain.Size = new System.Drawing.Size(181, 302);
+            this.contextMenuStripMain.Size = new System.Drawing.Size(161, 280);
             this.contextMenuStripMain.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStripMain_Opening);
             // 
             // RunAsAdminToolStripMenuItem
             // 
             this.RunAsAdminToolStripMenuItem.Name = "RunAsAdminToolStripMenuItem";
-            this.RunAsAdminToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.RunAsAdminToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.RunAsAdminToolStripMenuItem.Text = "管理员方式运行";
             this.RunAsAdminToolStripMenuItem.Click += new System.EventHandler(this.RunAsAdminToolStripMenuItem_Click);
             // 
@@ -100,41 +100,41 @@
             this.列表ToolStripMenuItem,
             this.平铺ToolStripMenuItem});
             this.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem";
-            this.ViewToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ViewToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.ViewToolStripMenuItem.Text = "查看";
             // 
             // 大图标ToolStripMenuItem
             // 
             this.大图标ToolStripMenuItem.Name = "大图标ToolStripMenuItem";
-            this.大图标ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.大图标ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.大图标ToolStripMenuItem.Text = "大图标";
             this.大图标ToolStripMenuItem.Click += new System.EventHandler(this.BigIconsToolStripMenuItem_Click);
             // 
             // 小图标ToolStripMenuItem
             // 
             this.小图标ToolStripMenuItem.Name = "小图标ToolStripMenuItem";
-            this.小图标ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.小图标ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.小图标ToolStripMenuItem.Text = "小图标";
             this.小图标ToolStripMenuItem.Click += new System.EventHandler(this.SmallIconsToolStripMenuItem_Click);
             // 
             // 详细ToolStripMenuItem
             // 
             this.详细ToolStripMenuItem.Name = "详细ToolStripMenuItem";
-            this.详细ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.详细ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.详细ToolStripMenuItem.Text = "详细";
             this.详细ToolStripMenuItem.Click += new System.EventHandler(this.DetailToolStripMenuItem_Click);
             // 
             // 列表ToolStripMenuItem
             // 
             this.列表ToolStripMenuItem.Name = "列表ToolStripMenuItem";
-            this.列表ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.列表ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.列表ToolStripMenuItem.Text = "列表";
             this.列表ToolStripMenuItem.Click += new System.EventHandler(this.ListToolStripMenuItem_Click);
             // 
             // 平铺ToolStripMenuItem
             // 
             this.平铺ToolStripMenuItem.Name = "平铺ToolStripMenuItem";
-            this.平铺ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.平铺ToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
             this.平铺ToolStripMenuItem.Text = "平铺";
             this.平铺ToolStripMenuItem.Click += new System.EventHandler(this.TileToolStripMenuItem_Click);
             // 
@@ -145,7 +145,7 @@
             this.AddDirToolStripMenuItem,
             this.AddNewToolStripMenuItem});
             this.AddToolStripMenuItem.Name = "AddToolStripMenuItem";
-            this.AddToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.AddToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.AddToolStripMenuItem.Text = "添加";
             // 
             // AddFileToolStripMenuItem
@@ -172,73 +172,73 @@
             // RemoveToolStripMenuItem
             // 
             this.RemoveToolStripMenuItem.Name = "RemoveToolStripMenuItem";
-            this.RemoveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.RemoveToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.RemoveToolStripMenuItem.Text = "删除";
             this.RemoveToolStripMenuItem.Click += new System.EventHandler(this.RemoveToolStripMenuItem_Click);
             // 
             // EditToolStripMenuItem
             // 
             this.EditToolStripMenuItem.Name = "EditToolStripMenuItem";
-            this.EditToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.EditToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.EditToolStripMenuItem.Text = "修改";
             this.EditToolStripMenuItem.Click += new System.EventHandler(this.EditToolStripMenuItem_Click);
             // 
             // ShowFileToolStripMenuItem
             // 
             this.ShowFileToolStripMenuItem.Name = "ShowFileToolStripMenuItem";
-            this.ShowFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ShowFileToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.ShowFileToolStripMenuItem.Text = "浏览文件";
             this.ShowFileToolStripMenuItem.Click += new System.EventHandler(this.ShowFileToolStripMenuItem_Click);
             // 
             // ClearToolStripMenuItem
             // 
             this.ClearToolStripMenuItem.Name = "ClearToolStripMenuItem";
-            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.ClearToolStripMenuItem.Text = "清空";
             this.ClearToolStripMenuItem.Click += new System.EventHandler(this.ClearToolStripMenuItem_Click);
             // 
             // EditPageToolStripMenuItem
             // 
             this.EditPageToolStripMenuItem.Name = "EditPageToolStripMenuItem";
-            this.EditPageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.EditPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.EditPageToolStripMenuItem.Text = "页面设置";
             this.EditPageToolStripMenuItem.Click += new System.EventHandler(this.EditPageToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(157, 6);
             // 
             // AddPageToolStripMenuItem
             // 
             this.AddPageToolStripMenuItem.Name = "AddPageToolStripMenuItem";
-            this.AddPageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.AddPageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.AddPageToolStripMenuItem.Text = "添加页面";
             this.AddPageToolStripMenuItem.Click += new System.EventHandler(this.AddPageToolStripMenuItem_Click);
             // 
             // RemovePageToolStripMenuItem
             // 
             this.RemovePageToolStripMenuItem.Name = "RemovePageToolStripMenuItem";
-            this.RemovePageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.RemovePageToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.RemovePageToolStripMenuItem.Text = "刪除页面";
             this.RemovePageToolStripMenuItem.Click += new System.EventHandler(this.RemovePageToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(157, 6);
             // 
             // SettingToolStripMenuItem
             // 
             this.SettingToolStripMenuItem.Name = "SettingToolStripMenuItem";
-            this.SettingToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.SettingToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.SettingToolStripMenuItem.Text = "设置";
             this.SettingToolStripMenuItem.Click += new System.EventHandler(this.SettingToolStripMenuItem_Click);
             // 
             // ExitToolStripMenuItem
             // 
             this.ExitToolStripMenuItem.Name = "ExitToolStripMenuItem";
-            this.ExitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ExitToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.ExitToolStripMenuItem.Text = "退出";
             this.ExitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
@@ -275,10 +275,10 @@
             // 
             this.panelButton.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.panelButton.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelButton.Location = new System.Drawing.Point(0, 338);
+            this.panelButton.Location = new System.Drawing.Point(0, 366);
             this.panelButton.Margin = new System.Windows.Forms.Padding(0);
             this.panelButton.Name = "panelButton";
-            this.panelButton.Size = new System.Drawing.Size(584, 23);
+            this.panelButton.Size = new System.Drawing.Size(584, 25);
             this.panelButton.TabIndex = 2;
             // 
             // panel1
@@ -287,15 +287,15 @@
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(584, 338);
+            this.panel1.Size = new System.Drawing.Size(584, 366);
             this.panel1.TabIndex = 3;
             // 
             // FormMain
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.ClientSize = new System.Drawing.Size(584, 361);
+            this.ClientSize = new System.Drawing.Size(584, 391);
             this.ContextMenuStrip = this.contextMenuStripMain;
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.panelButton);

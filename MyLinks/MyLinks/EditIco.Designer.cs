@@ -34,7 +34,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.textBoxName = new System.Windows.Forms.TextBox();
-            this.textBoxParth = new System.Windows.Forms.TextBox();
+            this.textBoxPath = new System.Windows.Forms.TextBox();
             this.textBoxArg = new System.Windows.Forms.TextBox();
             this.checkBoxRunAs = new System.Windows.Forms.CheckBox();
             this.linkLabel1 = new System.Windows.Forms.LinkLabel();
@@ -95,13 +95,13 @@
             this.textBoxName.Size = new System.Drawing.Size(325, 21);
             this.textBoxName.TabIndex = 5;
             // 
-            // textBoxParth
+            // textBoxPath
             // 
-            this.textBoxParth.Location = new System.Drawing.Point(48, 51);
-            this.textBoxParth.Multiline = true;
-            this.textBoxParth.Name = "textBoxParth";
-            this.textBoxParth.Size = new System.Drawing.Size(325, 66);
-            this.textBoxParth.TabIndex = 6;
+            this.textBoxPath.Location = new System.Drawing.Point(48, 51);
+            this.textBoxPath.Multiline = true;
+            this.textBoxPath.Name = "textBoxPath";
+            this.textBoxPath.Size = new System.Drawing.Size(325, 66);
+            this.textBoxPath.TabIndex = 6;
             // 
             // textBoxArg
             // 
@@ -141,7 +141,7 @@
             this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.checkBoxRunAs);
             this.Controls.Add(this.textBoxArg);
-            this.Controls.Add(this.textBoxParth);
+            this.Controls.Add(this.textBoxPath);
             this.Controls.Add(this.textBoxName);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -169,7 +169,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox textBoxName;
-        private System.Windows.Forms.TextBox textBoxParth;
+        private System.Windows.Forms.TextBox textBoxPath;
         private System.Windows.Forms.TextBox textBoxArg;
         private System.Windows.Forms.CheckBox checkBoxRunAs;
         private System.Windows.Forms.LinkLabel linkLabel1;

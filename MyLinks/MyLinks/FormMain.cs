@@ -10,6 +10,7 @@ namespace MyLinks
     public partial class FormMain : Form
     {
         public List<string> backimages = new List<string>();
+        public List<bool> backimgon = new List<bool>();
         public List<ListView> listViews = new List<ListView>();
         public List<Button> buttons = new List<Button>();
         public List<ImageList> largeImageLists = new List<ImageList>();
@@ -21,10 +22,10 @@ namespace MyLinks
         public bool hideRun;
         public bool noReadLnk;
         public bool dClick;
-        public int tbwidth;
-        public int tbheight;
-        public int lineSpacing;
-        public int columnSpacing;
+        public int tbwidth = 55;
+        public int tbheight = 23;
+        public int lineSpacing = 75;
+        public int columnSpacing = 75;
         public readonly string apppath;
         public readonly string appname;
         public readonly string appdir;
@@ -33,7 +34,6 @@ namespace MyLinks
         private int height;
         private int locationx;
         private int locationy;
-        //public Color colorB1 = Color.White;
         public Color colorF1 = Color.Black;
         public Color colorB2 = Color.LightBlue;
         public Color colorF2 = Color.Black;
@@ -47,13 +47,9 @@ namespace MyLinks
         public FormMain()
         {
             apppath = Application.ExecutablePath;
-            appdir = Application.StartupPath.TrimEnd('\\');
+            appdir = AppDomain.CurrentDomain.BaseDirectory;
             appname = System.IO.Path.GetFileNameWithoutExtension(apppath);
-            cfgFile = appdir + "\\" + appname + ".xml";
-            tbwidth = 55;
-            tbheight = 23;
-            lineSpacing = 75;
-            columnSpacing = 75;
+            cfgFile = $"{appdir}{appname}.xml";
             InitializeComponent();
             Load += FormMain_Load;
             FormClosing += FormMain_FormClosing;
@@ -65,22 +61,16 @@ namespace MyLinks
             {
                 Alignment = TabAlignment.Bottom,
                 ContextMenuStrip = contextMenuStripMain,
-                //tabControl.Dock = DockStyle.Fill;
                 ItemSize = new Size(48, 16),
-                //Location = new Point(0, 0),
                 Margin = new Padding(0),
                 Padding = new Point(0, 0)
             };
             panel1.Controls.Add(tabControl);
             ReadCfg();
             notifyIcon.Text = Text;
-            //if (tabControl.SelectedIndex > -1)
-            //{
-            //    buttons[tabControl.SelectedIndex].BackColor = Color.LightBlue;
-            //}
             panelButton.Height = tbheight;
             panelButton.Width = tbwidth;
-            string icofile = appdir + "\\" + appname + ".ico";
+            string icofile = $"{appdir}{appname}.ico";
             if (System.IO.File.Exists(icofile))
             {
                 try
@@ -108,13 +98,33 @@ namespace MyLinks
             }
             if (lineSpacing != 75 || columnSpacing != 75)
                 SetIcoSpacing();
+            SetBackImg();
+        }
+
+        private void SetBackImg()
+        {
+            for (int i = 0; i < listViews.Count; i++)
+            {
+                if (backimgon[i])
+                {
+                    try
+                    {
+                        using (Image image = Image.FromFile(backimages[i]))
+                        {
+                            listViews[i].BackgroundImage = image;
+                        }
+                    }
+                    catch (Exception)
+                    { }
+                }
+            }
         }
 
         public void SetIcoSpacing()
         {
             foreach (ListView listView in listViews)
             {
-                SendMessage(listView.Handle, 0x1035, 0, 0x10000 * columnSpacing + lineSpacing);
+                SendMessage(listView.Handle, 0x1035, 0, (0x10000 * columnSpacing) + lineSpacing);
             }
         }
 
@@ -151,7 +161,7 @@ namespace MyLinks
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!noexit || goexit)
+            if (!noexit || goexit || e.CloseReason != CloseReason.UserClosing)
             {
                 WriteCfg();
             }
@@ -269,7 +279,6 @@ namespace MyLinks
                 {
                     if (item == sender)
                     {
-                        //item.BackColor = Color.LightBlue;
                         item.ForeColor = colorF2;
                         item.BackColor = colorB2;// Color.LightBlue;
                     }
@@ -301,234 +310,169 @@ namespace MyLinks
         private void WriteCfg()
         {
             XmlDocument doc = new XmlDocument();
-            XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", null);
-            doc.AppendChild(dec);
-            XmlElement cfg = doc.CreateElement("Config");
-            doc.AppendChild(cfg);
-            XmlElement set = doc.CreateElement("Setting");
-            cfg.AppendChild(set);
-            XmlElement title = doc.CreateElement("Title");
-            title.InnerText = Text;
-            set.AppendChild(title);
-            XmlElement h = doc.CreateElement("Height");
-            h.InnerText = height.ToString();
-            set.AppendChild(h);
-            XmlElement w = doc.CreateElement("Width");
-            w.InnerText = width.ToString();
-            set.AppendChild(w);
-            XmlElement lx = doc.CreateElement("LocationX");
-            lx.InnerText = locationx.ToString();
-            set.AppendChild(lx);
-            XmlElement ly = doc.CreateElement("LocationY");
-            ly.InnerText = locationy.ToString();
-            set.AppendChild(ly);
-            XmlElement statusBar = doc.CreateElement("StatusBar");
-            statusBar.InnerText = ShowInTaskbar.ToString();
-            set.AppendChild(statusBar);
-            XmlElement showicon = doc.CreateElement("WindowIcon");
-            showicon.InnerText = ShowIcon.ToString();
-            set.AppendChild(showicon);
-            XmlElement hide = doc.CreateElement("HideStart");
-            hide.InnerText = hideStart.ToString();
-            set.AppendChild(hide);
-            XmlElement hrun = doc.CreateElement("HideRun");
-            hrun.InnerText = hideRun.ToString();
-            set.AppendChild(hrun);
-            XmlElement topmost = doc.CreateElement("TopMost");
-            topmost.InnerText = TopMost.ToString();
-            set.AppendChild(topmost);
-            XmlElement noex = doc.CreateElement("NotExit");
-            noex.InnerText = noexit.ToString();
-            set.AppendChild(noex);
-            XmlElement nordlnk = doc.CreateElement("NoReadLnk");
-            nordlnk.InnerText = noReadLnk.ToString();
-            set.AppendChild(nordlnk);
-            XmlElement dcl = doc.CreateElement("DoubleClickRun");
-            dcl.InnerText = dClick.ToString();
-            set.AppendChild(dcl);
-            XmlElement lspa = doc.CreateElement("LineSpacing");
-            lspa.InnerText = lineSpacing.ToString();
-            set.AppendChild(lspa);
-            XmlElement cspa = doc.CreateElement("ColumnSpacing");
-            cspa.InnerText = columnSpacing.ToString();
-            set.AppendChild(cspa);
-            XmlElement tbloc = doc.CreateElement("LabelLocation");
-            tbloc.InnerText = ((int)panelButton.Dock).ToString();
-            set.AppendChild(tbloc);
-            XmlElement tbbak1 = doc.CreateElement("LabelBackColor1");
-            tbbak1.InnerText = panelButton.BackColor.ToArgb().ToString();
-            set.AppendChild(tbbak1);
-            XmlElement tbbak2 = doc.CreateElement("LabelBackColor2");
-            tbbak2.InnerText = colorB2.ToArgb().ToString();
-            set.AppendChild(tbbak2);
-            XmlElement tbfore1 = doc.CreateElement("LabelForeColor1");
-            tbfore1.InnerText = colorF1.ToArgb().ToString();
-            set.AppendChild(tbfore1);
-            XmlElement tbfore2 = doc.CreateElement("LabelForeColor2");
-            tbfore2.InnerText = colorF2.ToArgb().ToString();
-            set.AppendChild(tbfore2);
-            XmlElement tbindex = doc.CreateElement("PageIndex");
-            tbindex.InnerText = tabControl.SelectedIndex.ToString();
-            set.AppendChild(tbindex);
-            XmlElement tbw = doc.CreateElement("LabelWidth");
-            tbw.InnerText = tbwidth.ToString();
-            set.AppendChild(tbw);
-            XmlElement tbh = doc.CreateElement("LabelHeight");
-            tbh.InnerText = tbheight.ToString();
-            set.AppendChild(tbh);
+            doc.AppendChild(doc.CreateXmlDeclaration("1.0", "utf-8", null));
+            doc.AppendChild(doc.CreateElement("Config"));
+            doc.SelectSingleNode("Config").AppendChild(doc.CreateElement("Setting"));
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("Title")).InnerText = Text;
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("Height")).InnerText = height.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("Width")).InnerText = width.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LocationX")).InnerText = locationx.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LocationY")).InnerText = locationy.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("StatusBar")).InnerText = ShowInTaskbar.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("WindowIcon")).InnerText = ShowIcon.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("HideStart")).InnerText = hideStart.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("HideRun")).InnerText = hideRun.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("TopMost")).InnerText = TopMost.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("NotExit")).InnerText = noexit.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("NoReadLnk")).InnerText = noReadLnk.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("DoubleClickRun")).InnerText = dClick.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LineSpacing")).InnerText = lineSpacing.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("ColumnSpacing")).InnerText = columnSpacing.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelLocation")).InnerText = ((int)panelButton.Dock).ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelBackColor1")).InnerText = panelButton.BackColor.ToArgb().ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelBackColor2")).InnerText = colorB2.ToArgb().ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelForeColor1")).InnerText = colorF1.ToArgb().ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelForeColor2")).InnerText = colorF2.ToArgb().ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("PageIndex")).InnerText = tabControl.SelectedIndex.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelWidth")).InnerText = tbwidth.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("LabelHeight")).InnerText = tbheight.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("HotKeyOn")).InnerText = hotkeyon.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("HotKey1")).InnerText = hotkey1.ToString();
+            doc.SelectSingleNode("Config/Setting").AppendChild(doc.CreateElement("HotKey2")).InnerText = hotkey2.ToString();
 
-            XmlElement hotkon = doc.CreateElement("HotKeyOn");
-            hotkon.InnerText = hotkeyon.ToString();
-            set.AppendChild(hotkon);
-            XmlElement hotk1 = doc.CreateElement("HotKey1");
-            hotk1.InnerText = hotkey1;
-            set.AppendChild(hotk1);
-            XmlElement hotk2 = doc.CreateElement("HotKey2");
-            hotk2.InnerText = hotkey2;
-            set.AppendChild(hotk2);
-
-            XmlElement datas = doc.CreateElement("Pages");
-            cfg.AppendChild(datas);
+            doc.SelectSingleNode("Config").AppendChild(doc.CreateElement("Pages"));
             for (int i = 0; i < listViews.Count; i++)
             {
-                XmlElement tbnane = doc.CreateElement("Name");
-                tbnane.InnerText = buttons[i].Text;
+                XmlElement tab = doc.CreateElement("Page");
+                tab.SetAttribute("Name", buttons[i].Text);
+                tab.SetAttribute("ListForeColor", listViews[i].ForeColor.ToArgb().ToString());
+                tab.SetAttribute("ListBackColor", listViews[i].BackColor.ToArgb().ToString());
+
                 XmlElement bk = doc.CreateElement("BackImage");
                 bk.SetAttribute("On", (listViews[i].BackgroundImage != null).ToString());
                 bk.SetAttribute("Tiled", listViews[i].BackgroundImageTiled.ToString());
-                bk.InnerText = backimages[i];
-                XmlElement fcolor = doc.CreateElement("ListForeColor");
-                fcolor.InnerText = listViews[i].ForeColor.ToArgb().ToString();
-                XmlElement bcolor = doc.CreateElement("ListBackColor");
-                bcolor.InnerText = listViews[i].BackColor.ToArgb().ToString();
-                XmlElement tab = doc.CreateElement("Page");
-                tab.AppendChild(tbnane);
+                bk.SetAttribute("File", backimages[i]);
+                //bk.InnerText = backimages[i];
                 tab.AppendChild(bk);
-                tab.AppendChild(fcolor);
-                tab.AppendChild(bcolor);
                 foreach (ListViewItem item in listViews[i].Items)
                 {
                     XmlElement data = doc.CreateElement("Data");
-                    XmlElement name = doc.CreateElement("Name");
-                    name.InnerText = item.Text;
-                    XmlElement fullpath = doc.CreateElement("FullPath");
-                    fullpath.InnerText = item.SubItems[1].Text;
-                    XmlElement arg = doc.CreateElement("Args");
-                    arg.InnerText = item.SubItems[2].Text;
-                    XmlElement runas = doc.CreateElement("RunAs");
-                    runas.InnerText = item.SubItems[3].Text;
-                    data.AppendChild(name);
-                    data.AppendChild(fullpath);
-                    data.AppendChild(arg);
-                    data.AppendChild(runas);
+                    data.SetAttribute("Name", item.Text);
+                    data.SetAttribute("FullPath", item.SubItems[1].Text);
+                    data.SetAttribute("Args", item.SubItems[2].Text);
+                    data.SetAttribute("RunAs", item.SubItems[3].Text);
                     tab.AppendChild(data);
                 }
-                datas.AppendChild(tab);
+                doc.SelectSingleNode("Config/Pages").AppendChild(tab);
             }
             doc.Save(cfgFile);
         }
 
         private void ReadCfg()
         {
-            if (!System.IO.File.Exists(cfgFile))
-            {
-                LoadDefault();
-                return;
-            }
+            DropNotUse();
+            string cfgbak = cfgFile + ".bak";
             try
             {
-                XmlDocument doc = new XmlDocument();
-                doc.Load(cfgFile);
-                Text = doc.SelectSingleNode("Config/Setting/Title").InnerText;
-                Height = int.Parse(doc.SelectSingleNode("Config/Setting/Height").InnerText);
-                Width = int.Parse(doc.SelectSingleNode("Config/Setting/Width").InnerText);
-                int lx = int.Parse(doc.SelectSingleNode("Config/Setting/LocationX").InnerText);
-                ShowInTaskbar = bool.Parse(doc.SelectSingleNode("Config/Setting/StatusBar").InnerText);
-                ShowIcon = bool.Parse(doc.SelectSingleNode("Config/Setting/WindowIcon").InnerText);
-                int ly = int.Parse(doc.SelectSingleNode("Config/Setting/LocationY").InnerText);
-                hideStart = bool.Parse(doc.SelectSingleNode("Config/Setting/HideStart").InnerText);
-                hideRun = bool.Parse(doc.SelectSingleNode("Config/Setting/HideRun").InnerText);
-                TopMost = bool.Parse(doc.SelectSingleNode("Config/Setting/TopMost").InnerText);
-                noexit = bool.Parse(doc.SelectSingleNode("Config/Setting/NotExit").InnerText);
-                noReadLnk = bool.Parse(doc.SelectSingleNode("Config/Setting/NoReadLnk").InnerText);
-                dClick = bool.Parse(doc.SelectSingleNode("Config/Setting/DoubleClickRun").InnerText);
-                lineSpacing = int.Parse(doc.SelectSingleNode("Config/Setting/LineSpacing").InnerText);
-                columnSpacing = int.Parse(doc.SelectSingleNode("Config/Setting/ColumnSpacing").InnerText);
-                tbwidth = int.Parse(doc.SelectSingleNode("Config/Setting/LabelWidth").InnerText);
-                tbheight = int.Parse(doc.SelectSingleNode("Config/Setting/LabelHeight").InnerText);
-                if (lx + Width <= 0)
-                {
-                    lx = 0;
-                }
-                if (lx >= Screen.PrimaryScreen.Bounds.Width)
-                {
-                    lx = Screen.PrimaryScreen.Bounds.Width - Width;
-                }
-                if (ly + Width <= 0)
-                {
-                    ly = 0;
-                }
-                if (ly >= Screen.PrimaryScreen.Bounds.Height)
-                {
-                    ly = Screen.PrimaryScreen.Bounds.Height - Height;
-                }
-                Location = new Point(lx, ly);
-                panelButton.Dock = (DockStyle)int.Parse(doc.SelectSingleNode("Config/Setting/LabelLocation").InnerText);
-                panelButton.BackColor = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor1").InnerText));
-                colorB2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor2").InnerText));
-                colorF1 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor1").InnerText));
-                colorF2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor2").InnerText));
-                try
-                {
-                    hotkeyon = bool.Parse(doc.SelectSingleNode("Config/Setting/HotKeyOn").InnerText);
-                    hotkey1 = doc.SelectSingleNode("Config/Setting/HotKey1").InnerText;
-                    hotkey2 = doc.SelectSingleNode("Config/Setting/HotKey2").InnerText;
-                }
-                catch (Exception)
-                {
-                    DefaultHotKey();
-                }
-                using (XmlNodeList tabs = doc.SelectNodes("Config/Pages/Page"))
-                {
-                    for (int i = 0; i < tabs.Count; i++)
-                    {
-                        AddPage(tabs[i].SelectSingleNode("Name").InnerText);
-                        backimages[i] = tabs[i].SelectSingleNode("BackImage").InnerText;
-                        if (bool.Parse(tabs[i].SelectSingleNode("BackImage").Attributes["On"].Value) && System.IO.File.Exists(backimages[i]))
-                        {
-                            try
-                            {
-                                listViews[i].BackgroundImage = Image.FromFile(backimages[i]);
-                            }
-                            catch (Exception)
-                            { }
-                        }
-                        listViews[i].BackgroundImageTiled = bool.Parse(tabs[i].SelectSingleNode("BackImage").Attributes["Tiled"].Value);
-                        listViews[i].ForeColor = Color.FromArgb(int.Parse(tabs[i].SelectSingleNode("ListForeColor").InnerText));
-                        listViews[i].BackColor = Color.FromArgb(int.Parse(tabs[i].SelectSingleNode("ListBackColor").InnerText));
-                        XmlNodeList items = tabs[i].SelectNodes("Data");
-                        foreach (XmlNode item in items)
-                        {
-                            IcoFileInfo icoFileInfo = new IcoFileInfo(item.SelectSingleNode("FullPath").InnerText)
-                            {
-                                Name = item.SelectSingleNode("Name").InnerText,
-                                Args = item.SelectSingleNode("Args").InnerText,
-                                RunAsA = item.SelectSingleNode("RunAs").InnerText.ToLower() == "true"
-                            };
-                            AddFile(icoFileInfo, i);
-                        }
-                    }
-                }
-                tabControl.SelectedIndex = int.Parse(doc.SelectSingleNode("Config/Setting/PageIndex").InnerText);
+                LoadXml(cfgFile);
+                System.IO.File.Copy(cfgFile, cfgbak, true);
             }
             catch (Exception)
             {
-                LoadDefault();
+                DropNotUse();
+                try
+                {
+                    LoadXml(cfgbak);
+                }
+                catch (Exception)
+                {
+                    DropNotUse();
+                    LoadDefault();
+                }
             }
             if (hotkeyon)
             {
                 OnHotKey();
             }
+        }
+
+        private void DropNotUse()
+        {
+            backimages.Clear();
+            listViews.Clear();
+            backimgon.Clear();
+        }
+
+        private void LoadXml(string xmlFile)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlFile);
+            Text = doc.SelectSingleNode("Config/Setting/Title").InnerText;
+            Height = int.Parse(doc.SelectSingleNode("Config/Setting/Height").InnerText);
+            Width = int.Parse(doc.SelectSingleNode("Config/Setting/Width").InnerText);
+            int lx = int.Parse(doc.SelectSingleNode("Config/Setting/LocationX").InnerText);
+            ShowInTaskbar = bool.Parse(doc.SelectSingleNode("Config/Setting/StatusBar").InnerText);
+            ShowIcon = bool.Parse(doc.SelectSingleNode("Config/Setting/WindowIcon").InnerText);
+            int ly = int.Parse(doc.SelectSingleNode("Config/Setting/LocationY").InnerText);
+            hideStart = bool.Parse(doc.SelectSingleNode("Config/Setting/HideStart").InnerText);
+            hideRun = bool.Parse(doc.SelectSingleNode("Config/Setting/HideRun").InnerText);
+            TopMost = bool.Parse(doc.SelectSingleNode("Config/Setting/TopMost").InnerText);
+            noexit = bool.Parse(doc.SelectSingleNode("Config/Setting/NotExit").InnerText);
+            noReadLnk = bool.Parse(doc.SelectSingleNode("Config/Setting/NoReadLnk").InnerText);
+            dClick = bool.Parse(doc.SelectSingleNode("Config/Setting/DoubleClickRun").InnerText);
+            lineSpacing = int.Parse(doc.SelectSingleNode("Config/Setting/LineSpacing").InnerText);
+            columnSpacing = int.Parse(doc.SelectSingleNode("Config/Setting/ColumnSpacing").InnerText);
+            tbwidth = int.Parse(doc.SelectSingleNode("Config/Setting/LabelWidth").InnerText);
+            tbheight = int.Parse(doc.SelectSingleNode("Config/Setting/LabelHeight").InnerText);
+            if (lx + Width <= 0)
+            {
+                lx = 0;
+            }
+            if (lx >= Screen.PrimaryScreen.Bounds.Width)
+            {
+                lx = Screen.PrimaryScreen.Bounds.Width - Width;
+            }
+            if (ly + Width <= 0)
+            {
+                ly = 0;
+            }
+            if (ly >= Screen.PrimaryScreen.Bounds.Height)
+            {
+                ly = Screen.PrimaryScreen.Bounds.Height - Height;
+            }
+            Location = new Point(lx, ly);
+            panelButton.Dock = (DockStyle)int.Parse(doc.SelectSingleNode("Config/Setting/LabelLocation").InnerText);
+            panelButton.BackColor = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor1").InnerText));
+            colorB2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelBackColor2").InnerText));
+            colorF1 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor1").InnerText));
+            colorF2 = Color.FromArgb(int.Parse(doc.SelectSingleNode("Config/Setting/LabelForeColor2").InnerText));
+            hotkeyon = bool.Parse(doc.SelectSingleNode("Config/Setting/HotKeyOn").InnerText);
+            hotkey1 = doc.SelectSingleNode("Config/Setting/HotKey1").InnerText;
+            hotkey2 = doc.SelectSingleNode("Config/Setting/HotKey2").InnerText;
+            using (XmlNodeList tabs = doc.SelectNodes("Config/Pages/Page"))
+            {
+                for (int i = 0; i < tabs.Count; i++)
+                {
+                    AddPage(tabs[i].Attributes["Name"].Value);
+                    listViews[i].ForeColor = Color.FromArgb(int.Parse(tabs[i].Attributes["ListForeColor"].Value));
+                    listViews[i].BackColor = Color.FromArgb(int.Parse(tabs[i].Attributes["ListBackColor"].Value));
+                    backimages[i] = tabs[i].SelectSingleNode("BackImage").Attributes["File"].Value;
+                    backimgon[i] = bool.Parse(tabs[i].SelectSingleNode("BackImage").Attributes["On"].Value) && System.IO.File.Exists(backimages[i]);
+                    listViews[i].BackgroundImageTiled = bool.Parse(tabs[i].SelectSingleNode("BackImage").Attributes["Tiled"].Value);
+                    XmlNodeList items = tabs[i].SelectNodes("Data");
+                    foreach (XmlNode item in items)
+                    {
+                        IcoFileInfo icoFileInfo = new IcoFileInfo(item.Attributes["FullPath"].Value)
+                        {
+                            Name = item.Attributes["Name"].Value,
+                            Args = item.Attributes["Args"].Value,
+                            RunAsA = item.Attributes["RunAs"].Value.ToLower() == "true"
+                        };
+                        AddFile(icoFileInfo, i);
+                    }
+                }
+            }
+            tabControl.SelectedIndex = int.Parse(doc.SelectSingleNode("Config/Setting/PageIndex").InnerText);
         }
 
         private void OnHotKey()
@@ -596,18 +540,14 @@ namespace MyLinks
             base.WndProc(ref m);
         }
 
-        private void DefaultHotKey()
-        {
-            hotkeyon = false;
-            hotkey1 = "Ctr";
-            hotkey2 = "F2 键";
-        }
         private void LoadDefault()
         {
             StartPosition = FormStartPosition.CenterScreen;
             Text = appname;
             notifyIcon.Text = appname;
-            DefaultHotKey();
+            hotkeyon = false;
+            hotkey1 = "Ctr";
+            hotkey2 = "F2 键";
         }
         #endregion
 
@@ -617,7 +557,7 @@ namespace MyLinks
             string dir = System.IO.Path.GetDirectoryName(path);
             if (path.Contains(" "))
             {
-                path = "\"" + path + "\"";
+                path = $"\"{path}\"";
             }
             using (System.Diagnostics.Process p = new System.Diagnostics.Process())
             {
@@ -663,14 +603,13 @@ namespace MyLinks
 
         private void AddFile(IcoFileInfo icoInfoFile, int i)
         {
-            largeImageLists[i].Images.Add(FilesystemIcons.LargeIcon(icoInfoFile.FullName));
-            smallImageLists[i].Images.Add(FilesystemIcons.SmallIcon(icoInfoFile.FullName));
+            smallImageLists[i].Images.Add(FilesystemIcons.GiveIcon(icoInfoFile.FullName, true));
+            largeImageLists[i].Images.Add(FilesystemIcons.GiveIcon(icoInfoFile.FullName, false));
             ListViewItem item = new ListViewItem
             {
                 Text = icoInfoFile.Name,
                 ImageIndex = largeImageLists[i].Images.Count - 1
             };
-            //item.SubItems.Add(icoInfoFile.Type);
             item.SubItems.Add(icoInfoFile.FullName);
             item.SubItems.Add(icoInfoFile.Args);
             item.SubItems.Add(icoInfoFile.RunAsA.ToString());
@@ -715,6 +654,7 @@ namespace MyLinks
         private void AddPage(string pgname)
         {
             backimages.Add("");
+            backimgon.Add(false);
             ImageList large = new ImageList
             {
                 ImageSize = new Size(32, 32),
@@ -740,7 +680,6 @@ namespace MyLinks
                 Padding = new Padding(0),
                 MultiSelect = false,
                 ShowItemToolTips = true
-                //UseCompatibleStateImageBehavior = false
             };
             listView.DragDrop += ListViews_DragDrop;
             listView.DragOver += ListView_DragOver;
@@ -749,17 +688,14 @@ namespace MyLinks
             listView.DoubleClick += ListView_DoubleClick;
             listView.MouseDown += ListView_MouseDown;
             listView.Columns.Add("名称", 100, HorizontalAlignment.Left);
-            //listView.Columns.Add("类型", 60, HorizontalAlignment.Left);
             listView.Columns.Add("路径", 300, HorizontalAlignment.Left);
             listView.Columns.Add("参数", 100, HorizontalAlignment.Left);
             listView.Columns.Add("管理员权限", 100, HorizontalAlignment.Left);
-            //listView.ArrangeIcons();
             listViews.Add(listView);
             TabPage tabPage = new TabPage
             {
                 Location = new Point(0),
                 Margin = new Padding(0),
-                //tabPage.Size = new Size(652, 403);
                 Padding = new Padding(0),
                 Text = pgname
             };
@@ -767,18 +703,14 @@ namespace MyLinks
             tabControl.TabPages.Add(tabPage);
             Button button = new Button
             {
-                //BackColor = Color.Transparent,// Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(0),
                 Padding = new Padding(0),
-                //Location = new Point(tbwidth * buttons.Count, 0),
                 Size = new Size(tbwidth, tbheight),
                 Text = pgname,
                 UseVisualStyleBackColor = false
             };
-            //button.FlatAppearance.BorderColor = Color.LightBlue;
             button.Click += new EventHandler(Button_Click);
-            //button.MouseDown += new MouseEventHandler(Button_MouseDown);
             buttons.Add(button);
             panelButton.Controls.Add(button);
         }
@@ -786,6 +718,7 @@ namespace MyLinks
         private void RemovePage(int i)
         {
             backimages.RemoveAt(i);
+            backimgon.RemoveAt(i);
             listViews.RemoveAt(i);
             largeImageLists.RemoveAt(i);
             smallImageLists.RemoveAt(i);
@@ -835,12 +768,13 @@ namespace MyLinks
             RemoveToolStripMenuItem.Visible = b;
             ShowFileToolStripMenuItem.Visible = b;
             EditToolStripMenuItem.Visible = b;
-            toolStripMenuItem1.Visible = tabControl.TabPages.Count > 0;
-            RemovePageToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-            ViewToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-            AddToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
-            ClearToolStripMenuItem.Visible = tabControl.TabPages.Count > 0 && listViews[tabControl.SelectedIndex].Items.Count > 0; ;
-            EditPageToolStripMenuItem.Visible = tabControl.TabPages.Count > 0;
+            bool haspg = tabControl.TabPages.Count > 0;
+            toolStripMenuItem1.Visible = haspg;
+            RemovePageToolStripMenuItem.Visible = haspg;
+            ViewToolStripMenuItem.Visible = haspg;
+            AddToolStripMenuItem.Visible = haspg;
+            ClearToolStripMenuItem.Visible = haspg && listViews[tabControl.SelectedIndex].Items.Count > 0;
+            EditPageToolStripMenuItem.Visible = haspg;
         }
 
         private void BigIconsToolStripMenuItem_Click(object sender, EventArgs e) => listViews[tabControl.SelectedIndex].View = View.LargeIcon;
@@ -893,20 +827,19 @@ namespace MyLinks
             int j = listViews[i].SelectedItems[0].Index;
             if (listViews[i].SelectedItems.Count > 0)
             {
-                if (MessageBox.Show(this, "确定要删除选择的项目吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) != DialogResult.Yes)
+                if (MessageBox.Show(this, "确定要删除选择的项目吗？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
                 {
-                    return;
+                    listViews[i].Items.RemoveAt(j);
+                    if (j < listViews[i].Items.Count)
+                    {
+                        listViews[i].Items[j].Selected = true;
+                    }
+                    else if (listViews[i].Items.Count > 0)
+                    {
+                        listViews[i].Items[j - 1].Selected = true;
+                    }
+                    WriteCfg();
                 }
-                listViews[i].Items.RemoveAt(j);
-                if (j < listViews[i].Items.Count)
-                {
-                    listViews[i].Items[j].Selected = true;
-                }
-                else if (listViews[i].Items.Count > 0)
-                {
-                    listViews[i].Items[j - 1].Selected = true;
-                }
-                WriteCfg();
             }
         }
 
@@ -919,10 +852,10 @@ namespace MyLinks
                     string ffull = listViews[tabControl.SelectedIndex].SelectedItems[0].SubItems[1].Text;
                     if (ffull.Contains(" "))
                     {
-                        ffull = "\"" + ffull + "\"";
+                        ffull = $"\"{ffull}\"";
                     }
                     p.StartInfo.FileName = "Explorer.exe";
-                    p.StartInfo.Arguments = "/e,/select," + ffull;
+                    p.StartInfo.Arguments = $"/e,/select,{ffull}";
                     p.Start();
                     p.Close();
                 }
@@ -982,8 +915,8 @@ namespace MyLinks
                     {
                         if (listViews[i1].Items[i].SubItems[1].Text != editIco.f.FullName)
                         {
-                            largeImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.LargeIcon(editIco.f.FullName).ToBitmap();
-                            smallImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.SmallIcon(editIco.f.FullName).ToBitmap();
+                            smallImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.GiveIcon(editIco.f.FullName, true).ToBitmap();
+                            largeImageLists[i1].Images[listViews[i1].Items[i].ImageIndex] = FilesystemIcons.GiveIcon(editIco.f.FullName, false).ToBitmap();
                         }
                         listViews[i1].Items[i].Text = editIco.f.Name;
                         listViews[i1].Items[i].SubItems[1].Text = editIco.f.FullName;
@@ -1046,6 +979,7 @@ namespace MyLinks
                 }
                 setting.ShowDialog();
             }
+            SetIcoSpacing();
             if (w1 != tbwidth || h1 != tbheight)
             {
                 FitButton();
@@ -1076,11 +1010,16 @@ namespace MyLinks
             Args = "";
             RunAsA = false;
             NameWithEx = System.IO.Path.GetFileName(filename);
-            Name = NameWithEx.Trim('.').Contains(".") ? NameWithEx.Substring(0, NameWithEx.LastIndexOf(".")) : NameWithEx;
-            //Type = System.IO.Directory.Exists(filename) ? "<DIR>" : System.IO.Path.GetExtension(filename);
+            if (System.IO.Directory.Exists(filename))
+            {
+                Name = System.IO.Path.GetFileName(filename);
+            }
+            else
+            {
+                Name = System.IO.Path.GetFileNameWithoutExtension(filename);
+            }
         }
         public string Name { get; set; }
-        //public string Type { get; set; }
         public string NameWithEx { get; set; }
         public string FullName { set; get; }
         public string Args { set; get; }

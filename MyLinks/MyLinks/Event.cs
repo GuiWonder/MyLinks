@@ -298,7 +298,6 @@ namespace MyLinks
                     vkey = Keys.None;
                     break;
             }
-
             return vkey;
         }
 

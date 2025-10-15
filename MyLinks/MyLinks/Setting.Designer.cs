@@ -64,6 +64,7 @@
             this.checkBoxHotKey = new System.Windows.Forms.CheckBox();
             this.comboBoxKey1 = new System.Windows.Forms.ComboBox();
             this.comboBoxKey2 = new System.Windows.Forms.ComboBox();
+            this.linkLabelHome = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxB1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxF1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxB2)).BeginInit();
@@ -128,7 +129,7 @@
             // 
             this.textBoxTitle.Location = new System.Drawing.Point(12, 24);
             this.textBoxTitle.Name = "textBoxTitle";
-            this.textBoxTitle.Size = new System.Drawing.Size(372, 21);
+            this.textBoxTitle.Size = new System.Drawing.Size(372, 22);
             this.textBoxTitle.TabIndex = 0;
             this.textBoxTitle.TextChanged += new System.EventHandler(this.TextBoxTitle_TextChanged);
             // 
@@ -358,7 +359,7 @@
             0,
             0});
             this.numericUpDownC.Name = "numericUpDownC";
-            this.numericUpDownC.Size = new System.Drawing.Size(47, 21);
+            this.numericUpDownC.Size = new System.Drawing.Size(47, 22);
             this.numericUpDownC.TabIndex = 30;
             this.numericUpDownC.Value = new decimal(new int[] {
             75,
@@ -390,7 +391,7 @@
             0,
             0});
             this.numericUpDownLabW.Name = "numericUpDownLabW";
-            this.numericUpDownLabW.Size = new System.Drawing.Size(47, 21);
+            this.numericUpDownLabW.Size = new System.Drawing.Size(47, 22);
             this.numericUpDownLabW.TabIndex = 32;
             this.numericUpDownLabW.Value = new decimal(new int[] {
             55,
@@ -412,7 +413,7 @@
             0,
             0});
             this.numericUpDownLabH.Name = "numericUpDownLabH";
-            this.numericUpDownLabH.Size = new System.Drawing.Size(47, 21);
+            this.numericUpDownLabH.Size = new System.Drawing.Size(47, 22);
             this.numericUpDownLabH.TabIndex = 32;
             this.numericUpDownLabH.Value = new decimal(new int[] {
             23,
@@ -434,7 +435,7 @@
             0,
             0});
             this.numericUpDownL.Name = "numericUpDownL";
-            this.numericUpDownL.Size = new System.Drawing.Size(47, 21);
+            this.numericUpDownL.Size = new System.Drawing.Size(47, 22);
             this.numericUpDownL.TabIndex = 30;
             this.numericUpDownL.Value = new decimal(new int[] {
             75,
@@ -573,11 +574,22 @@
             this.comboBoxKey2.Size = new System.Drawing.Size(134, 20);
             this.comboBoxKey2.TabIndex = 35;
             // 
+            // linkLabelHome
+            // 
+            this.linkLabelHome.AutoSize = true;
+            this.linkLabelHome.Location = new System.Drawing.Point(334, 335);
+            this.linkLabelHome.Name = "linkLabelHome";
+            this.linkLabelHome.Size = new System.Drawing.Size(53, 12);
+            this.linkLabelHome.TabIndex = 36;
+            this.linkLabelHome.TabStop = true;
+            this.linkLabelHome.Text = "访问主页";
+            // 
             // Setting
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(398, 336);
+            this.ClientSize = new System.Drawing.Size(399, 356);
+            this.Controls.Add(this.linkLabelHome);
             this.Controls.Add(this.comboBoxKey2);
             this.Controls.Add(this.comboBoxKey1);
             this.Controls.Add(this.checkBoxHotKey);
@@ -672,5 +684,6 @@
         private System.Windows.Forms.CheckBox checkBoxHotKey;
         private System.Windows.Forms.ComboBox comboBoxKey1;
         private System.Windows.Forms.ComboBox comboBoxKey2;
+        private System.Windows.Forms.LinkLabel linkLabelHome;
     }
 }

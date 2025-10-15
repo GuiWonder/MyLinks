@@ -10,47 +10,6 @@ namespace MyLinks
         private const int SHGFI_SMALLICON = 0x1;
         private const int SHGFI_LARGEICON = 0x0;
 
-        #region PublicIcons
-        public static Icon ICON_FILE_16x = ExtractIconFromFileX16(@"C:\Windows\system32\shell32.dll", 0);
-        public static Icon ICON_FILE_32x = ExtractIconFromFileX32(@"C:\Windows\system32\shell32.dll", 0);
-        #endregion
-
-        public static Icon SmallIcon(string pfad)
-        {
-            if (string.IsNullOrEmpty(pfad))
-            {
-                return ICON_FILE_16x;
-            }
-            try
-            {
-                return GetSmallIcon(pfad) ?? ICON_FILE_16x;
-            }
-            catch (Exception)
-            {
-                return ICON_FILE_16x;
-            }
-        }
-
-        public static Icon LargeIcon(string pfad)
-        {
-            if (string.IsNullOrEmpty(pfad))
-            {
-                return ICON_FILE_32x;
-            }
-            try
-            {
-                return GetLargeIcon(pfad) ?? ICON_FILE_32x;
-            }
-            catch (Exception)
-            {
-                return ICON_FILE_32x;
-            }
-        }
-
-        [DllImport("shell32.dll", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
-        public static extern IntPtr SHGetFileInfo(string pszPath, int dwFileAttributes, ref SHFILEINFO psfi, int cbFileInfo, int uFlags);
-        [DllImport("Shell32.dll", EntryPoint = "ExtractIconExW", CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
-        public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
         public struct SHFILEINFO
         {
             public IntPtr hIcon;
@@ -62,55 +21,51 @@ namespace MyLinks
             public string szTypeName;
         }
 
-        #region PrivateMethods
-        private static Icon ExtractIconFromFileX16(string file, int iconindex)
+        [DllImport("shell32.dll", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern IntPtr SHGetFileInfo(string pszPath, int dwFileAttributes, ref SHFILEINFO psfi, int cbFileInfo, int uFlags);
+        [DllImport("shell32.dll", EntryPoint = "ExtractIconExW", CharSet = CharSet.Unicode, ExactSpelling = true, CallingConvention = CallingConvention.StdCall)]
+        public static extern int ExtractIconEx(string sFile, int iIndex, out IntPtr piLargeVersion, out IntPtr piSmallVersion, int amountIcons);
+
+        public static Icon GiveIcon(string pfad, bool IsSmall)
+        {
+            Icon defico = ExtractIconFromFileXIs16(@"C:\Windows\system32\shell32.dll", 0, IsSmall);
+            if (string.IsNullOrEmpty(pfad))
+            {
+                return defico;
+            }
+            try
+            {
+                return GetIcon(pfad, IsSmall) ?? defico;
+            }
+            catch (Exception)
+            {
+                return defico;
+            }
+        }
+
+        private static Icon GetIcon(string pfad, bool IsSmall)
+        {
+            int SHGFI_SLICON = IsSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON;
+            SHFILEINFO shinfo = new SHFILEINFO
+            {
+                szDisplayName = new string((char)0, 260),
+                szTypeName = new string((char)0, 80)
+            };
+            SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_SLICON);
+            return Icon.FromHandle(shinfo.hIcon);
+        }
+
+        private static Icon ExtractIconFromFileXIs16(string file, int iconindex, bool IsSmall)
         {
             try
             {
                 ExtractIconEx(file, iconindex, out IntPtr large, out IntPtr small, 1);
-                return Icon.FromHandle(small);
+                return IsSmall ? Icon.FromHandle(small) : Icon.FromHandle(large);
             }
             catch (Exception)
             {
                 return null;
             }
         }
-
-        private static Icon ExtractIconFromFileX32(string file, int iconindex)
-        {
-            try
-            {
-                ExtractIconEx(file, iconindex, out IntPtr large, out IntPtr small, 1);
-                return Icon.FromHandle(large);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-        #endregion
-
-        #region PublicMethods
-        public static Icon GetSmallIcon(string pfad)
-        {
-            SHFILEINFO shinfo = new SHFILEINFO
-            {
-                szDisplayName = new string((char)0, 260),
-                szTypeName = new string((char)0, 80)
-            };
-            SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_SMALLICON);
-            return Icon.FromHandle(shinfo.hIcon);
-        }
-        public static Icon GetLargeIcon(string pfad)
-        {
-            SHFILEINFO shinfo = new SHFILEINFO
-            {
-                szDisplayName = new string((char)0, 260),
-                szTypeName = new string((char)0, 80)
-            };
-            SHGetFileInfo(pfad, 0, ref shinfo, Marshal.SizeOf(shinfo), SHGFI_ICON | SHGFI_LARGEICON);
-            return Icon.FromHandle(shinfo.hIcon);
-        }
-        #endregion
     }
 }

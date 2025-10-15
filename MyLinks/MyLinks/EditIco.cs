@@ -10,7 +10,7 @@ namespace MyLinks
             InitializeComponent();
             f = f1;
             textBoxName.Text = f.Name;
-            textBoxParth.Text = f.FullName;
+            textBoxPath.Text = f.FullName;
             textBoxArg.Text = f.Args;
             checkBoxRunAs.Checked = f.RunAsA;
         }
@@ -24,7 +24,7 @@ namespace MyLinks
                 return;
             }
             f.Name = textBoxName.Text.Trim();
-            f.FullName = textBoxParth.Text.Trim();
+            f.FullName = textBoxPath.Text.Trim(" \"'".ToCharArray()).Trim();
             f.Args = textBoxArg.Text.Trim();
             f.RunAsA = checkBoxRunAs.Checked;
             DialogResult = DialogResult.OK;
@@ -41,7 +41,7 @@ namespace MyLinks
             {
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    textBoxParth.Text = openFileDialog.FileName;
+                    textBoxPath.Text = openFileDialog.FileName;
                 }
             }
         }

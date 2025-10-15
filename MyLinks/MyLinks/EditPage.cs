@@ -87,14 +87,7 @@ namespace MyLinks
             {
                 if (!string.IsNullOrWhiteSpace(textBoxImg.Text))
                 {
-                    if (System.IO.File.Exists(textBoxImg.Text.Trim()))
-                    {
-                        SetBKImage(textBoxImg.Text.Trim());
-                    }
-                    else
-                    {
-                        MessageBox.Show(this, "文件读取不存在！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    SetBKImage(textBoxImg.Text.Trim());
                 }
                 e.Handled = true;
             }
@@ -102,17 +95,24 @@ namespace MyLinks
 
         private void SetBKImage(string imgfile)
         {
-            try
+            if (System.IO.File.Exists(imgfile))
             {
-                using (Image image = Image.FromFile(imgfile))
+                try
                 {
-                    f1.listViews[i].BackgroundImage = image;
+                    using (Image image = Image.FromFile(imgfile))
+                    {
+                        f1.listViews[i].BackgroundImage = image;
+                    }
+                    f1.backimages[i] = imgfile;
                 }
-                f1.backimages[i] = imgfile;
+                catch (Exception)
+                {
+                    MessageBox.Show(this, "文件读取错误！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-            catch (Exception)
+            else
             {
-                MessageBox.Show(this, "文件读取错误！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, $"文件{imgfile}不存在！", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

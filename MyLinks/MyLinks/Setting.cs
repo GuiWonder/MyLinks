@@ -53,6 +53,7 @@ namespace MyLinks
             comboBoxKey1.Enabled = checkBoxHotKey.Checked;
             comboBoxKey2.Enabled = checkBoxHotKey.Checked;
             checkBoxHotKey.CheckedChanged += CheckBoxHotKey_CheckedChanged;
+            linkLabelHome.LinkClicked += (s, e) => System.Diagnostics.Process.Start("https://github.com/GuiWonder/MyLinks");
         }
 
         private void CheckBoxHotKey_CheckedChanged(object sender, EventArgs e)
@@ -67,13 +68,10 @@ namespace MyLinks
             string appName = f1.appname;
             if (appPath.Contains(" "))
             {
-                appPath = "\"" + appPath + "\"";
+                appPath = $"\"{appPath}\"";
             }
-            RegistryKey rgk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            if (rgk == null)
-            {
-                rgk = Registry.CurrentUser.CreateSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");
-            }
+            RegistryKey rgk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true)
+                ?? Registry.CurrentUser.CreateSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");
             if (isOn == true)
             {
                 rgk.SetValue(appName, appPath);
