@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -552,8 +552,15 @@ namespace MyLinks
         #endregion
 
         #region Method
+        private string CheckPath(string path)
+        {
+            if (System.IO.File.Exists($"{appdir}{path}") || System.IO.Directory.Exists($"{appdir}{path}")) return $"{appdir}{path}";
+            return path;
+        }
+
         private void RunIcon(string path, string arg, bool runas)
         {
+            path = CheckPath(path);
             string dir = System.IO.Path.GetDirectoryName(path);
             if (path.Contains(" "))
             {
